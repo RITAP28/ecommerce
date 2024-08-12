@@ -14,11 +14,10 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       fontFamily: {
-        Dmsans: ["DM Sans", "sans-serif"],
-        Philosopher: ["Philosopher", "sans-serif"],
-        SpaceGrotesk: ["SpaceGrotesk", "sans-serif"],
-        Dmserif: ["DM Serif Text", "serif"],
-        Code: ["Source Code Pro", "monospace"]
+        sans: ['var(--font-inter)', 'sans-serif'],
+        Philosopher: ["var(--font-philosopher)", "sans-serif"],
+        SpaceGrotesk: ["var(--font-space)", "sans-serif"],
+        Code: ["var(--font-codePro)", "monospace"]
       },
     },
   },

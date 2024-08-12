@@ -4,7 +4,14 @@ import "./globals.css";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 
-const inter = Inter({ subsets: ["latin"] });
+export const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+export const space = Space_Grotesk({ subsets: ["latin"], variable: '--font-space' });
+export const codePro = Source_Code_Pro({ subsets: ["latin"], variable: '--font-codePro' });
+export const philosopher = Philosopher({
+  weight: "400",
+  subsets: ["latin"],
+  variable: '--font-philosopher'
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
