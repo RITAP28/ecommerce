@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk, Source_Code_Pro, Philosopher } from "next/font/google";
 import "./globals.css";
+import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +18,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="w-full h-[8vh]">
+          <Header />
+        </div>
+        <div className="w-full flex flex-row h-[92vh]">
+          
+          <div className="w-[20%]">
+            <Sidebar />
+          </div>
+          <div className="w-[80%]">
+            {children}
+          </div>
+        </div>
+      </body>
     </html>
   );
 }

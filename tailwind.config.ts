@@ -13,6 +13,13 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      fontFamily: {
+        Dmsans: ["DM Sans", "sans-serif"],
+        Philosopher: ["Philosopher", "sans-serif"],
+        SpaceGrotesk: ["SpaceGrotesk", "sans-serif"],
+        Dmserif: ["DM Serif Text", "serif"],
+        Code: ["Source Code Pro", "monospace"]
+      },
     },
   },
   plugins: [],
