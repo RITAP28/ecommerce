@@ -19,7 +19,7 @@ const Header = () => {
                 <Link href="/about" className="hover:bg-white hover:text-black transition ease-in-out duration-150 px-2 py-1 rounded-md">Our Story</Link>
             </div>
             <div className="basis-1/4 w-full flex justify-center items-center">
-                <Link href="/about" className="hover:bg-white hover:text-black transition ease-in-out duration-150 px-2 py-1 rounded-md">Login</Link>
+                <Link href="/signin" className="hover:bg-white hover:text-black transition ease-in-out duration-150 px-2 py-1 rounded-md">Login</Link>
             </div>
         </div>
     </div>
