@@ -1,8 +1,3 @@
-import Image from "next/image";
-import { products } from "./lib/data";
-import { FaShoppingCart } from "react-icons/fa";
-import { AiFillThunderbolt } from "react-icons/ai";
-import { philosopher } from "./layout";
 import ProductCard from "./components/ProductCard";
 
 export default function Home() {
