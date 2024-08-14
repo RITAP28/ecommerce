@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
 import Button from "@/app/components/Button";
-import { signIn } from "@/app/server/auth";
 import React, { useState } from "react";
 
 const Signin = () => {
+
   const [formdata, setFormData] = useState({
     email: "",
     password: "",
@@ -24,10 +24,7 @@ const Signin = () => {
       </div>
       <div className="w-full flex justify-center items-start pt-[3rem] h-full">
         <form
-          action={async (formdata) => {
-            "use server";
-            await signIn("credentials", formdata);
-          }}
+          action=""
           className="border-2 border-white px-8 py-6"
           method="post"
         >
