@@ -6,7 +6,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { Prisma } from "@prisma/client";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    adapter: PrismaAdapter(Prisma),
   providers: [
     credentials({
         name: "Credentials",
@@ -21,8 +20,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
         },
         authorize: async (credentials) => {
-            const email = credentials.email as string | undefined;
-            const password = credentials.password as string | undefined;
+            const email = credentials.email as string;
+            const password = credentials.password as string;
 
             if(!email || !password){
                 throw new CredentialsSignin("All fields are required");
