@@ -1,49 +1,28 @@
-'use client'
-
-import { login } from "@/app/api/auth/route";
 import {SubmitButton} from "@/app/components/Button";
-import axios from "axios";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import React, { useState } from "react";
+import { CredentialsSignin } from "next-auth";
+import { signIn } from "@/auth";
 
-const Signin = () => {
-  const [error, setError] = useState<string>('');
-  const [formdata, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+const Page = () => {
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formdata,
-      [e.target.id]: e.target.value,
-    });
-  };
+  const handleLogin = async (formData: FormData) => {
+    'use server'
+    const email = formData.get('email') as string | undefined;
+    const password = formData.get('password') as string | undefined;
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if(!email || !password){
+      throw new Error("All fields are required");
+    };
+
     try {
-      const res = await axios.post(`/api/auth/login`, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: formdata.email,
-          password: formdata.password
-        })
+      await signIn("credentials", {
+        email,
+        password
       });
-      const loginData = await res.data();
-      if(loginData){
-        redirect('/');
-      } else {
-        console.log("Login failed");
-        setError(loginData.msg);
-        throw new Error("Login failed");
-      }
+      redirect('/');
     } catch (error) {
-      setError("Error while logging in...");
-      throw new Error("Login failed");
+      const err = error as CredentialsSignin;
+      return err.message;
     };
   };
 
@@ -54,18 +33,15 @@ const Signin = () => {
       </div>
       <div className="w-full flex justify-center items-start pt-[3rem] h-full">
         <form
-          action=""
+          action={handleLogin}
           className="border-2 border-white px-8 py-6"
-          method="post"
-          onSubmit={handleLogin}
         >
           <div className="pb-4">
             <SigninField
               type={`email`}
               text={"Email"}
               id={`email`}
-              value={formdata.email}
-              onChange={handleInputChange}
+              name={`email`}
             />
           </div>
           <div className="pb-4">
@@ -73,8 +49,7 @@ const Signin = () => {
               type={`text`}
               text={`Password`}
               id={`password`}
-              value={formdata.password}
-              onChange={handleInputChange}
+              name={`password`}
             />
           </div>
           <div className="w-full pt-4 pb-2 flex justify-center">
@@ -86,20 +61,18 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Page;
 
 const SigninField = ({
   type,
   text,
   id,
-  value,
-  onChange,
+  name
 }: {
   type: string;
   text: string;
   id: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  name: string;
 }) => {
   return (
     <>
@@ -107,11 +80,9 @@ const SigninField = ({
         <p className="text-white pb-1">{text}:</p>
         <input
           type={type}
-          name=""
+          name={name}
           size={30}
           id={id}
-          value={value}
-          onChange={onChange}
           className="w-full pl-2 py-2 text-black rounded-sm"
           placeholder={`Your ${text}`}
         />

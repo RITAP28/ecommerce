@@ -1,55 +1,42 @@
-"use client";
-
 import { SubmitButton } from "@/app/components/Button";
-import axios from "axios";
-import { headers } from "next/headers";
+import { prisma } from "@/db";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import bcrypt from "bcryptjs";
 
 const Signup = () => {
-  const [error, setError] = useState<string>("");
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const handleRegister = async (formData: FormData) => {
+    "use server";
+    const username = formData.get("username") as string | undefined;
+    const email = formData.get("email") as string | undefined;
+    const password = formData.get("password") as string | undefined;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(
-        "/api/auth/register",
-        {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const registrationData = await res.data;
-      if (registrationData.msg === 'New User created') {
-        redirect("/");
-      } else {
-        console.log("registration failed");
-        setError(registrationData.msg);
-        throw new Error("Registration failed");
-      }
-    } catch (error) {
-      console.log("Registration failed");
-      setError("Error while signing up...");
-      throw new Error("Registration failed");
+    if (!username || !email || !password) {
+      throw new Error("All fields are required");
     }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (user) {
+      throw new Error("User already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.create({
+      data: {
+        username: username,
+        email: email,
+        password: hashedPassword,
+        isAuthenticated: true,
+        isVerified: true,
+      },
+    });
+
+    redirect('/');
   };
 
   return (
@@ -60,18 +47,15 @@ const Signup = () => {
         </div>
         <div className="w-full flex justify-center items-start pt-[3rem] h-full">
           <form
-            action=""
+            action={handleRegister}
             className="border-2 border-white px-8 py-6"
-            method="post"
-            onSubmit={handleRegister}
           >
             <div className="pb-4">
               <SignupField
                 type={`username`}
                 text={"Username"}
                 id={`username`}
-                value={formData.username}
-                onChange={handleInputChange}
+                name={`username`}
               />
             </div>
             <div className="pb-4">
@@ -79,8 +63,7 @@ const Signup = () => {
                 type={`email`}
                 text={"Email"}
                 id={`email`}
-                value={formData.email}
-                onChange={handleInputChange}
+                name={`email`}
               />
             </div>
             <div className="pb-4">
@@ -88,8 +71,7 @@ const Signup = () => {
                 type={`text`}
                 text={`Password`}
                 id={`password`}
-                value={formData.password}
-                onChange={handleInputChange}
+                name={`password`}
               />
             </div>
             <div className="w-full pt-4 pb-2 flex justify-center">
@@ -108,14 +90,12 @@ const SignupField = ({
   type,
   text,
   id,
-  value,
-  onChange,
+  name,
 }: {
   type: string;
   text: string;
   id: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  name: string;
 }) => {
   return (
     <>
@@ -123,11 +103,9 @@ const SignupField = ({
         <p className="text-white pb-1">{text}:</p>
         <input
           type={type}
-          name=""
+          name={name}
           size={30}
           id={id}
-          value={value}
-          onChange={onChange}
           className="w-full pl-2 py-2 text-black rounded-sm"
           placeholder={`Your ${text}`}
         />
