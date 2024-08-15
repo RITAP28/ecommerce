@@ -3,6 +3,22 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { sendToken } from "@/app/utils/sendToken";
 
+export async function POST(req: NextRequest, res: NextResponse) {
+    const {pathname} = new URL(req.url);
+
+    if(pathname.endsWith('/signin')){
+        return login(req, res);
+    } else if(pathname.endsWith('/signup')){
+        return register(req, res);
+    } else if(pathname.endsWith('/logout')){
+        return logout(req, res);
+    } else {
+        return NextResponse.json({
+            message: "Invalid Request"
+        }, { status: 400 })
+    };
+};
+
 export const login = async (req: NextRequest, res: NextResponse) => {
     try {
         const { email, password } = await req.json();
@@ -51,7 +67,6 @@ export const register = async (req: NextRequest, res: NextResponse) => {
 
         const existingUser = await prisma.user.findUnique({
             where: {
-                username: username,
                 email: email
             }
         });
@@ -92,3 +107,4 @@ export const logout = async (req: NextRequest, res: NextResponse) => {
         },{ status: 500 });
     };
 };
+

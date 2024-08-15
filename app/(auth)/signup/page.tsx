@@ -24,18 +24,21 @@ const Signup = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/auth/register", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const res = await axios.post(
+        "/api/auth/register",
+        {
           username: formData.username,
           email: formData.email,
           password: formData.password,
-        }),
-      });
-      const registrationData = await res.data();
-      if (registrationData.success) {
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const registrationData = await res.data;
+      if (registrationData.msg === 'New User created') {
         redirect("/");
       } else {
         console.log("registration failed");
@@ -67,7 +70,7 @@ const Signup = () => {
                 type={`username`}
                 text={"Username"}
                 id={`username`}
-                value={formData.email}
+                value={formData.username}
                 onChange={handleInputChange}
               />
             </div>
