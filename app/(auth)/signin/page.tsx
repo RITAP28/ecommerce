@@ -1,10 +1,14 @@
 'use client'
 
-import Button from "@/app/components/Button";
+import { login } from "@/app/api/auth/route";
+import {SubmitButton} from "@/app/components/Button";
+import axios from "axios";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import React, { useState } from "react";
 
 const Signin = () => {
-
+  const [error, setError] = useState<string>('');
   const [formdata, setFormData] = useState({
     email: "",
     password: "",
@@ -17,6 +21,32 @@ const Signin = () => {
     });
   };
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`/api/auth/login`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formdata.email,
+          password: formdata.password
+        })
+      });
+      const loginData = await res.data();
+      if(loginData){
+        redirect('/');
+      } else {
+        console.log("Login failed");
+        setError(loginData.msg);
+        throw new Error("Login failed");
+      }
+    } catch (error) {
+      setError("Error while logging in...");
+      throw new Error("Login failed");
+    };
+  };
+
   return (
     <div className="w-full bg-black h-[92vh]">
       <div className="w-full flex justify-center text-white">
@@ -27,6 +57,7 @@ const Signin = () => {
           action=""
           className="border-2 border-white px-8 py-6"
           method="post"
+          onSubmit={handleLogin}
         >
           <div className="pb-4">
             <SigninField
@@ -47,7 +78,7 @@ const Signin = () => {
             />
           </div>
           <div className="w-full pt-4 pb-2 flex justify-center">
-            <Button text={`Login`} />
+            <SubmitButton text={`Login`} />
           </div>
         </form>
       </div>
