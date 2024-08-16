@@ -26,10 +26,11 @@ export async function GET(
           cartItems: cart,
         },
         {
-          status: 200,
+          status: 204, // No Content
         }
       );
     } catch (error) {
+      console.error('error while getting all the items from the cart: ', error);
       throw new Error("Error fetching products from the cart");
     }
   }
@@ -71,7 +72,7 @@ export async function POST(
     // add the product to the user's cart
     const addedProduct = await prisma.cart.create({
       data: {
-        userId: Number(userId),
+        userId: user.id,
         productId,
         productName,
         productDescription,
@@ -92,6 +93,7 @@ export async function POST(
       }
     );
   } catch (error) {
+    console.error('error while adding to the cart, POST req is: ', error);
     throw new Error("Error while adding to the cart");
   };
 };

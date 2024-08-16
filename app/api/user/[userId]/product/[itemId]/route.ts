@@ -29,7 +29,7 @@ export async function PUT(req: NextRequest, { params } : {
             });
         };
 
-        const newQuantity = action === 'increase' ? product.pQuantity += 1 : product.pQuantity -= 1;
+        const newQuantity = action === 'increase' ? product.pQuantity + 1 : product.pQuantity - 1;
 
         if(newQuantity < 0){
             return NextResponse.json({
@@ -58,6 +58,7 @@ export async function PUT(req: NextRequest, { params } : {
             status: 200
         });
     } catch (error) {
+        console.error('error while updating product quantity', error);
         throw new Error("Error while updating the cart");
     };
 };
@@ -102,9 +103,10 @@ export async function DELETE({ params } : {
         return NextResponse.json({
             msg: 'Product deleted successfully'
         },{
-            status: 200
+            status: 204 // No Content
         });
     } catch (error) {
+        console.error('error while deleting product', error);
         throw new Error("Error while deleting the product from the cart");
     };
 };

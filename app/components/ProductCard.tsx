@@ -4,8 +4,12 @@ import { FaShoppingCart } from "react-icons/fa";
 import { AiFillThunderbolt } from "react-icons/ai";
 import { philosopher } from "../layout";
 import Image from 'next/image';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import axios from 'axios';
 
-const ProductCard = () => {
+const ProductCard = async () => {
+  const session = await auth();
   return (
     <div className='w-full grid grid-flow-cols grid-cols-3 gap-x-2 gap-y-6 pt-4 px-2'>
         {products.map((product, index) => (
@@ -30,6 +34,22 @@ const ProductCard = () => {
               <button
                 type="button"
                 className="bg-black border-2 border-white text-white hover:bg-white hover:text-black transition ease-in-out duration-150 rounded-md w-full py-2"
+                onClick={async () => {
+                  'use server'
+                  const userId = session?.user.id;
+                    if(!session){
+                      redirect('/signin');
+                    } else {
+                      const res = await axios.post(`api/user/${userId}`, {
+                        productId: product.id,
+                        productName: product.name,
+                        productDescription: product.description,
+                        productImage: product.image
+                      });
+                      console.log('product added to cart successfully -> ', res.data);
+
+                    }
+                }}
               >
                 <span className="flex justify-center w-full gap-1">
                   <div className="flex items-center pr-2">
