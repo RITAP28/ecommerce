@@ -1,5 +1,8 @@
-import React from 'react'
-import Button from '../components/Button';
+'use client'
+
+import React, { useState } from 'react'
+import {Button} from '../components/Button';
+import axios from 'axios';
 
 const page = () => {
   return (
@@ -22,19 +25,19 @@ const UploadForm = () => {
                 <div className="w-full flex flex-col text-white">
                     <div className="w-full pb-2">
                         <p className="w-full pb-1">Product Name:</p>
-                        <input type="text" name="" className='w-full py-1 pl-1 text-black' placeholder='Enter product name' />
+                        <input type="text" name="productName" className='w-full py-1 pl-1 text-black' placeholder='Enter product name' />
                     </div>
                     <div className="w-full py-2">
                         <p className="w-full pb-1">Product Description:</p>
-                        <textarea name="" className='w-full pl-1 text-black' placeholder='Enter product description' />
+                        <textarea name="productDescription" className='w-full pl-1 text-black' placeholder='Enter product description' />
                     </div>
                     <div className="w-full py-2">
-                        <p className="w-full pb-1">Product Description:</p>
-                        <input type="file" name="" className='w-full' />
+                        <p className="w-full pb-1">Product Image:</p>
+                        <input type="file" name="productImage" className='w-full' />
                     </div>
                     <div className="w-full py-2">
                         <p className="w-full pb-1">Product Price:</p>
-                        <input type="number" name="" className='w-full py-1 pl-1 text-black' placeholder='Product price' />
+                        <input type="number" name="productPrice" className='w-full py-1 pl-1 text-black' placeholder='Product price' />
                     </div>
                     <div className="w-full pt-4 pb-2 flex justify-center">
                         <Button text={`Upload`} />

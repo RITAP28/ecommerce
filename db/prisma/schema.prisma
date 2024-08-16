@@ -21,6 +21,7 @@ model User {
   isAuthenticated Boolean   @default(false)
   isVerified      Boolean   @default(false)
   Session         Session[]
+  Cart            Cart[]
 }
 
 model Session {
@@ -39,4 +40,15 @@ model Product {
   productDescription String?
   productPrice       Int
   productImage       String
+}
+
+model Cart {
+  productId   Int
+  productName String
+  userId      Int
+  userName    String
+  pQuantity   Int
+  user        User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@unique([productId, userId])
 }

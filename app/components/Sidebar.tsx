@@ -1,8 +1,7 @@
-
-
 import React from 'react'
 import { codePro } from '../layout';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 const Buttons = [
   {
@@ -18,7 +17,11 @@ const Buttons = [
     text: 'Upload Product',
     link: '/upload'
   }
-]
+];
+
+const onClick = (text: string) => {
+  redirect(`/${text}`);
+}
 
 const Sidebar = () => {
   return (
@@ -28,7 +31,9 @@ const Sidebar = () => {
       </div>
       {Buttons.map((button, index) => (
         <>
-        <ButtonComponent text={button.text} link={button.link} key={index} />
+        <ButtonComponent text={button.text} link={button.link} key={index} onClick={() => {
+          onClick(button.text)
+        }} />
         </>
       ))}
     </div>
@@ -40,6 +45,7 @@ export default Sidebar;
 const ButtonComponent = ({ text, link } : {
   text: string;
   link: string;
+  onClick: () => void;
 }) => {
   return (
     <>
