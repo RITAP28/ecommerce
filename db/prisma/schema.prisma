@@ -43,12 +43,14 @@ model Product {
 }
 
 model Cart {
-  productId   Int
-  productName String
-  userId      Int
-  userName    String
-  pQuantity   Int
-  user        User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  productId          Int
+  productName        String
+  productDescription String
+  productImage       String
+  userId             Int
+  userName           String
+  pQuantity          Int
+  user               User   @relation(references: [id], fields: [userId], onDelete: Cascade)
 
   @@unique([productId, userId])
 }
