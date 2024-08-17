@@ -42,12 +42,12 @@ export async function POST(
     params,
   }: {
     params: {
-      id: string;
+      userId: string;
     };
   }
 ) {
   try {
-    const userId = params.id;
+    const userId = params.userId;
     const { productId, productDescription, productName, productImage } =
       await req.json();
 
@@ -94,6 +94,13 @@ export async function POST(
     );
   } catch (error) {
     console.error('error while adding to the cart, POST req is: ', error);
-    throw new Error("Error while adding to the cart");
+    return NextResponse.json(
+        {
+          message: "There was an error adding the product to the cart",
+        },
+        {
+          status: 500,
+        }
+      );
   };
 };

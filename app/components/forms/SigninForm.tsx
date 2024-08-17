@@ -3,12 +3,16 @@
 import React from 'react'
 import { SigninField } from './fields/SigninField'
 import { SubmitButton } from '../Button'
-import { signIn } from '@/auth'
+import { auth, signIn } from '@/auth'
 import { CredentialsSignin } from 'next-auth'
 import { useRouter } from 'next/navigation'
 
-const SigninForm = () => {
+const SigninForm = async () => {
     const router = useRouter();
+    const session = await auth();
+    if(session?.user){
+      router.refresh();
+    }
   return (
     <form
           action={async (formData: FormData) => {
@@ -28,7 +32,7 @@ const SigninForm = () => {
               const err = error as CredentialsSignin;
               return err.message;
             };
-            router.refresh();
+            router.push(`/`);
           }}
           className="border-2 border-white px-8 py-6"
         >
