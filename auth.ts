@@ -2,8 +2,7 @@ import NextAuth, { CredentialsSignin } from "next-auth"
 import credentials from "next-auth/providers/credentials" 
 import { prisma } from "./db";
 import bcrypt from 'bcryptjs';
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { Prisma } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -45,7 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return {
                 name: user.username,
                 email: user.email,
-                id: user.id.toString()
+                id: String(user.id)
             };
         },
     })
@@ -53,4 +52,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/auth/signin",
   },
+  callbacks: {
+    async jwt({ token, user }) {
+        if(user){
+            token.id = user.id as string;
+        };
+        return token;
+    },
+    async session({ session, token }) {
+        if(token){
+            session.user.id = token.id as string;
+        };
+        return session;
+    },
+  }
 })

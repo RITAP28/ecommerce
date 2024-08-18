@@ -1,6 +1,9 @@
 import SigninForm from "@/app/components/forms/SigninForm";
+import { auth } from "@/auth";
 
-const Page = () => {
+const Page = async () => {
+  const session = await auth();
+  console.log("user found in sign -> page.tsx: ", session?.user);
   return (
     <div className="w-full bg-black h-[92vh]">
       <div className="w-full flex justify-center text-white">

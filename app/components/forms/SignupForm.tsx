@@ -1,18 +1,16 @@
-"use client";
-
 import React from "react";
 import { SignupField } from "./fields/SignupField";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/db";
-import { useRouter } from "next/navigation";
 import { SubmitButton } from "../Button";
+import { redirect } from "next/navigation";
 
 const SignupForm = () => {
-  const router = useRouter();
   return (
     <>
       <form
         action={async (formData: FormData) => {
+          'use server'
           const username = formData.get("username") as string | undefined;
           const email = formData.get("email") as string | undefined;
           const password = formData.get("password") as string | undefined;
@@ -42,7 +40,7 @@ const SignupForm = () => {
               isVerified: true,
             },
           });
-          router.refresh();
+          redirect('/');
         }}
         className="border-2 border-white px-8 py-6"
       >

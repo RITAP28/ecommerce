@@ -4,7 +4,7 @@ import Link from "next/link"
 
 const Header = async () => {
     const session = await auth();
-    console.log("user found -> ", session?.user);
+    console.log("user found in Headers.tsx -> ", session?.user);
   return (
     <div className="w-full h-full bg-black text-white flex flex-row">
         <div className="w-[20%] flex justify-center items-center font-bold font-Code">

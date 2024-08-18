@@ -2,6 +2,7 @@ import React from 'react'
 import { codePro } from '../layout';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 
 const Buttons = [
   {
@@ -23,7 +24,9 @@ const onClick = (text: string) => {
   redirect(`/${text}`);
 }
 
-const Sidebar = () => {
+const Sidebar = async () => {
+  const session = await auth();
+  console.log("user found in Sidebar.tsx: ", session?.user);
   return (
     <div className='w-full h-full bg-black text-white'>
       <div className={`w-full pb-6 pt-2 flex justify-center ${codePro.variable}`}>
