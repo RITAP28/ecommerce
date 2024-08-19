@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState, useState } from "react";
+import React, { useState } from "react";
 import { SignupField } from "./fields/SignupField";
 import { SubmitButton } from "../Button";
 import { signup } from "@/app/actions/auth";
@@ -9,13 +9,18 @@ import Link from "next/link";
 
 const SignupForm = () => {
   const [state, setState] = useState<any>({});
+  const [data, setData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  })
   const [pending, setPending] = useState<boolean>(false);
 
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...state,
+    setData({
+      ...data,
       [e.target.id]: e.target.value
     })
   };
@@ -25,10 +30,11 @@ const SignupForm = () => {
     setPending(true);
 
     const formElement = e.target as HTMLFormElement;
-
     const formData = new FormData(formElement);
-    console.log(formData);
-    console.log(state);
+
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
 
     const result = await signup(state, formData);
 
@@ -46,13 +52,13 @@ const SignupForm = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="border-2 border-white px-8 py-6">
+      <form id="signupform" onSubmit={handleSubmit} className="border-2 border-white px-8 py-6">
         <div className="pb-4">
           <SignupField
             type={`username`}
             text={"Username"}
             id={`username`}
-            name={`username`}
+            name='username'
             onChange={handleChange}
           />
         </div>
@@ -62,7 +68,7 @@ const SignupForm = () => {
             type={`email`}
             text={"Email"}
             id={`email`}
-            name={`email`}
+            name='email'
             onChange={handleChange}
           />
         </div>
@@ -72,7 +78,7 @@ const SignupForm = () => {
             type={`text`}
             text={`Password`}
             id={`password`}
-            name={`password`}
+            name='password'
             onChange={handleChange}
           />
         </div>

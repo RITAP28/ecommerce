@@ -9,7 +9,7 @@ import { sendtoken } from "../lib/sendToken";
 export async function signup(state: FormState, formData: FormData){
     try {
         const validatedFields = SignUpFormSchema.safeParse({
-            name: formData.get('name'),
+            name: formData.get('username'),
             email: formData.get('email'),
             password: formData.get('password')
         });

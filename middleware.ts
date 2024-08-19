@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+
+const publicRoutes = ['/', '/signin', '/signup'];
+const protectedRoutes = ['/cart', '/wishlist', '/orders'];
  
-// This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
-  return NextResponse.redirect(new URL('/home', request.url))
+  const path = request.nextUrl.pathname;
+  const isPublicRoutes = publicRoutes.includes(path);
+  const isProtectedRoutes = protectedRoutes.includes(path);
+
+  
 }
  
 // See "Matching Paths" below to learn more

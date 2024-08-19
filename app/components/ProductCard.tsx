@@ -1,15 +1,11 @@
 'use client'; // Add this line at the top of your component
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { products } from "../lib/data";
 import { FaShoppingCart } from "react-icons/fa";
 import { AiFillThunderbolt } from "react-icons/ai";
 import { philosopher } from "../layout";
 import Image from "next/image";
-import { handleAddToCart, handleGetUser } from "../utils/utils";
-import { auth } from "@/auth";
-import axios from "axios";
-import { useRouter } from "next/navigation";
 
 const ProductCard = () => {
   return (

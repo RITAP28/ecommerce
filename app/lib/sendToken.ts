@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/db";
+import { cookies } from "next/headers";
 
 interface User {
   id: number;
@@ -16,6 +17,7 @@ export async function sendtoken(
 ) {
   const token = jwt.sign(
     {
+      id: user.id,
       username: user.username,
       email: user.email,
     },
@@ -45,7 +47,7 @@ export async function sendtoken(
         }
     });
     console.log(session);
-    res.cookies.set('token', token, options);
+    cookies().set('token', token, options);
     return NextResponse.json({
         msg: "Session created successfully",
         session: session
