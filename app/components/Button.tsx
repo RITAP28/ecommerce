@@ -12,12 +12,13 @@ const Button = ({ text, onClick }: { text: string, onClick: () => void }) => {
   );
 };
 
-const SubmitButton = ({ text } : {
+const SubmitButton = ({ text, isPending } : {
   text: string;
+  isPending: boolean;
 }) => {
   return (
-    <button type="submit" className="px-6 py-2 bg-black text-white hover:bg-white hover:text-black border-2 border-white rounded-sm transition ease-in-out duration-200">
-      {text}
+    <button aria-disabled={isPending} type="submit" className="px-6 py-2 bg-black text-white hover:bg-white hover:text-black border-2 border-white rounded-sm transition ease-in-out duration-200">
+      {isPending ? "Signing you up..." : text}
     </button>
   )
 }

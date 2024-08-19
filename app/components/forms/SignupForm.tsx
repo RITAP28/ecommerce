@@ -1,49 +1,40 @@
-import React from "react";
+"use client";
+
+import React, { useActionState, useState } from "react";
 import { SignupField } from "./fields/SignupField";
-import bcrypt from "bcryptjs";
-import { prisma } from "@/db";
 import { SubmitButton } from "../Button";
-import { redirect } from "next/navigation";
+import { signup } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
 
 const SignupForm = () => {
+  const [state, setState] = useState<any>({});
+  const [pending, setPending] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPending(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    const result = await signup(state, formData);
+
+    if (result?.errors) {
+      setState({ ...state, errors: result.errors });
+    } else {
+      setPending(false);
+      setState({ ...state, errors: {} });
+      alert("Registration successfull");
+      router.push("/");
+    }
+
+    setPending(false);
+  };
+
   return (
     <>
-      <form
-        action={async (formData: FormData) => {
-          'use server'
-          const username = formData.get("username") as string | undefined;
-          const email = formData.get("email") as string | undefined;
-          const password = formData.get("password") as string | undefined;
-
-          if (!username || !email || !password) {
-            throw new Error("All fields are required");
-          }
-
-          const user = await prisma.user.findUnique({
-            where: {
-              email: email,
-            },
-          });
-
-          if (user) {
-            throw new Error("User already exists");
-          }
-
-          const hashedPassword = await bcrypt.hash(password, 10);
-
-          await prisma.user.create({
-            data: {
-              username: username,
-              email: email,
-              password: hashedPassword,
-              isAuthenticated: true,
-              isVerified: true,
-            },
-          });
-          redirect('/');
-        }}
-        className="border-2 border-white px-8 py-6"
-      >
+      <form onSubmit={handleSubmit} className="border-2 border-white px-8 py-6">
         <div className="pb-4">
           <SignupField
             type={`username`}
@@ -52,6 +43,7 @@ const SignupForm = () => {
             name={`username`}
           />
         </div>
+        {state?.errors?.name && <p>{state.errors.name}</p>}
         <div className="pb-4">
           <SignupField
             type={`email`}
@@ -60,6 +52,7 @@ const SignupForm = () => {
             name={`email`}
           />
         </div>
+        {state?.errors?.email && <p>{state.errors.email}</p>}
         <div className="pb-4">
           <SignupField
             type={`text`}
@@ -68,8 +61,18 @@ const SignupForm = () => {
             name={`password`}
           />
         </div>
+        {state?.errors?.password && (
+          <div>
+            <p>Password must:</p>
+            <ul>
+              {state.errors.password.map((error: string, index: number) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="w-full pt-4 pb-2 flex justify-center">
-          <SubmitButton text={`Register`} />
+          <SubmitButton text={`Register`} isPending={pending} />
         </div>
       </form>
     </>
