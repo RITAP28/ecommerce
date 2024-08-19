@@ -49,7 +49,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest ) {
   try {
     const session = await auth();
     let userId: string | null = null;
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 401 }
       );
     }
-    const { productId, productDescription, productName, productImage } =
+    const { productId, productDescription, productName, productImage, email } =
       await req.json();
     // find the user from the database
     const user = await prisma.user.findUnique({

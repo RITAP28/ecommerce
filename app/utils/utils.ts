@@ -18,6 +18,8 @@ export const handleAddToCart = async (productId: number, productName: string, pr
         productName,
         productDescription,
         productImage,
+      },{
+        withCredentials: true
       });
       console.log("product added to cart successfully -> ", res.data);
     }
@@ -28,7 +30,9 @@ export const handleAddToCart = async (productId: number, productName: string, pr
 
 export const handleGetUser = async () => {
   try {
-    const user = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user`);
+    const user = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
+      withCredentials: true
+    });
     console.log("user found -> ", user);
   } catch (error) {
     console.error("Error while getting user: ", error);

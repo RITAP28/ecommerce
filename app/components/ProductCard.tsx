@@ -1,17 +1,19 @@
 'use client'; // Add this line at the top of your component
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { products } from "../lib/data";
 import { FaShoppingCart } from "react-icons/fa";
 import { AiFillThunderbolt } from "react-icons/ai";
 import { philosopher } from "../layout";
 import Image from "next/image";
 import { handleAddToCart, handleGetUser } from "../utils/utils";
+import { auth } from "@/auth";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const ProductCard = () => {
-  useEffect(() => {
-    handleGetUser();
-  }, []);
+
+
   return (
     <div className="w-full grid grid-flow-cols grid-cols-3 gap-x-2 gap-y-6 pt-4 px-2">
       {products.map((product, index) => (
@@ -43,9 +45,9 @@ const ProductCard = () => {
               <button
                 type="button"
                 className="bg-black border-2 border-white text-white hover:bg-white hover:text-black transition ease-in-out duration-150 rounded-md w-full py-2"
-                onClick={() =>
-                  handleAddToCart(product.id, product.name, product.description, product.image)
-                }
+                // onClick={() =>
+                //   handleAddToCart(product.id, product.name, product.description, product.image)
+                // }
               >
                 <span className="flex justify-center w-full gap-1">
                   <div className="flex items-center pr-2">
