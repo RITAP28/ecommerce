@@ -24,3 +24,15 @@ export type FormState = | {
         password?: string[]
     }
 } | undefined;
+
+export const SignInFormSchema = z.object({
+    email: z.string().email({ message: "Please enter a valid email" }).trim(),
+    password: z.string().min(5, { message: "Be at least 5 characters long" }).trim()
+});
+
+export type SignInFormState = | {
+    errors?: {
+        email?: string[];
+        password?: string[]
+    }
+} | undefined;

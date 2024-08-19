@@ -12,8 +12,6 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 
 const ProductCard = () => {
-
-
   return (
     <div className="w-full grid grid-flow-cols grid-cols-3 gap-x-2 gap-y-6 pt-4 px-2">
       {products.map((product, index) => (

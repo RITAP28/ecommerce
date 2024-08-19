@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={`${inter.variable} ${codePro.variable} ${philosopher.variable} ${space.variable}`}>
+      <body>
         <div className="w-full h-[8vh]">
           <Header />
         </div>

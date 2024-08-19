@@ -5,6 +5,7 @@ import { SignupField } from "./fields/SignupField";
 import { SubmitButton } from "../Button";
 import { signup } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const SignupForm = () => {
   const [state, setState] = useState<any>({});
@@ -12,11 +13,22 @@ const SignupForm = () => {
 
   const router = useRouter();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setState({
+      ...state,
+      [e.target.id]: e.target.value
+    })
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPending(true);
 
-    const formData = new FormData(e.currentTarget);
+    const formElement = e.target as HTMLFormElement;
+
+    const formData = new FormData(formElement);
+    console.log(formData);
+    console.log(state);
 
     const result = await signup(state, formData);
 
@@ -26,7 +38,7 @@ const SignupForm = () => {
       setPending(false);
       setState({ ...state, errors: {} });
       alert("Registration successfull");
-      router.push("/");
+      router.push("/cart");
     }
 
     setPending(false);
@@ -41,24 +53,27 @@ const SignupForm = () => {
             text={"Username"}
             id={`username`}
             name={`username`}
+            onChange={handleChange}
           />
         </div>
-        {state?.errors?.name && <p>{state.errors.name}</p>}
+        {state?.errors?.name && <p className="text-red-400">{state.errors.name}</p>}
         <div className="pb-4">
           <SignupField
             type={`email`}
             text={"Email"}
             id={`email`}
             name={`email`}
+            onChange={handleChange}
           />
         </div>
-        {state?.errors?.email && <p>{state.errors.email}</p>}
+        {state?.errors?.email && <p className="text-red-400">{state.errors.email}</p>}
         <div className="pb-4">
           <SignupField
             type={`text`}
             text={`Password`}
             id={`password`}
             name={`password`}
+            onChange={handleChange}
           />
         </div>
         {state?.errors?.password && (
@@ -66,7 +81,7 @@ const SignupForm = () => {
             <p>Password must:</p>
             <ul>
               {state.errors.password.map((error: string, index: number) => (
-                <li key={index}>{error}</li>
+                <li key={index} className="text-red-400">{error}</li>
               ))}
             </ul>
           </div>
@@ -74,6 +89,14 @@ const SignupForm = () => {
         <div className="w-full pt-4 pb-2 flex justify-center">
           <SubmitButton text={`Register`} isPending={pending} />
         </div>
+        <div className="w-full text-white">
+            <p className="">Already have an account?</p>
+            <p className="">
+              <Link href='/signup' className=''>
+                Login
+              </Link>
+            </p>
+          </div>
       </form>
     </>
   );

@@ -25,8 +25,6 @@ const onClick = (text: string) => {
 }
 
 const Sidebar = async () => {
-  const session = await auth();
-  console.log("user found in Sidebar.tsx: ", session?.user);
   return (
     <div className='w-full h-full bg-black text-white'>
       <div className={`w-full pb-6 pt-2 flex justify-center ${codePro.variable}`}>
