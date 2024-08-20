@@ -36,3 +36,10 @@ export type SignInFormState = | {
         password?: string[]
     }
 } | undefined;
+
+export type SessionPayload = {
+    id?: number;
+    username?: string;
+    email?: string;
+    expiresAt: Date
+}

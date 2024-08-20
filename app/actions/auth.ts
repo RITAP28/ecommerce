@@ -5,6 +5,7 @@ import { FormState, SignInFormSchema, SignInFormState, SignUpFormSchema } from "
 import { NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { sendtoken } from "../lib/sendToken";
+import { createSession, updateSession } from "../lib/session";
 
 export async function signup(state: FormState, formData: FormData){
     try {
@@ -44,8 +45,7 @@ export async function signup(state: FormState, formData: FormData){
         });
 
         // Send token to the client
-        const res = NextResponse.next();
-        await sendtoken(newUser, 200, res);
+        await createSession(newUser.id, newUser.username, newUser.email);
 
         return {
             success: true,
@@ -99,8 +99,13 @@ export async function signin(state: SignInFormState, formData: FormData){
             };
         };
 
-        const response = NextResponse.next();
-        await sendtoken(existingUser, 200, response);
+        const existingSession = await prisma.session.findUnique({
+            where: {
+                userId: existingUser.id
+            }
+        })
+
+        await updateSession(existingUser.id, existingUser.username, existingUser.email, String(existingSession?.sessionToken))
 
         return {
             success: true,
