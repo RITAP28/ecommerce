@@ -103,9 +103,9 @@ export async function signin(state: SignInFormState, formData: FormData){
             where: {
                 userId: existingUser.id
             }
-        })
+        });
 
-        await updateSession(existingUser.id, existingUser.username, existingUser.email, String(existingSession?.sessionToken))
+        await updateSession(existingUser.id, existingUser.username, existingUser.email)
 
         return {
             success: true,

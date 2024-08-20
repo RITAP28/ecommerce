@@ -1,8 +1,14 @@
 import { cookies } from "next/headers";
 import { SessionPayload } from "./definitions";
-import { jwtVerify, SignJWT } from "jose";
+import { JWTPayload, jwtVerify, SignJWT } from "jose";
 import { prisma } from "@/db";
 import { redirect } from "next/navigation";
+
+interface PayloadProps extends JWTPayload {
+    id: number;
+    username: string;
+    email: string;
+}
 
 const encodedKey = new TextEncoder().encode(process.env.AUTH_SECRET);
 
@@ -18,7 +24,9 @@ export async function encrypt(payload: SessionPayload) {
 
 export async function decrypt(token: string) {
   try {
-    const { payload } = await jwtVerify(token, encodedKey, {
+    const { payload } : {
+        payload: PayloadProps
+    } = await jwtVerify(token, encodedKey, {
       algorithms: ["HS256"],
     });
     return payload;
@@ -60,7 +68,7 @@ export async function createSession(
   };
 };
 
-export async function updateSession(id: number, username: string, email: string, token: string){
+export async function updateSession(id: number, username: string, email: string){
     try {
         const existingSession = await prisma.session.findUnique({
             where: {
@@ -98,5 +106,25 @@ export async function updateSession(id: number, username: string, email: string,
         });
     } catch (error) {
         console.error("Error while updating session: ", error);
+    };
+};
+
+export async function getUser(token: string){
+    try {
+        const payload = await decrypt(token);
+        if(!payload){
+            throw new Error("Invalid token");
+        };
+
+        console.log("payload email: ", payload.email);
+
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                email: payload.email
+            }
+        });
+        return existingUser;
+    } catch (error) {
+        console.error("Error while fetching user info: ", error);
     };
 };

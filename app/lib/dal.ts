@@ -1,35 +1,35 @@
 'use server'
 
 import { cookies } from "next/headers";
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
-
-interface Decoded extends JwtPayload {
-    id?: number;
-    email?: string;
-    username?: string;
-};
+import { decrypt } from "./session";
 
 export const verifyUser = cache(async () => {
     const cookie = cookies().get('token')?.value as string;
-    const decodedToken = jwt.verify(cookie, process.env.AUTH_SECRET as string) as Decoded;
 
-    if(!decodedToken.id){
+    if(!cookie){
+        redirect('/signin');
+    };
+    console.log(cookie);
+
+    const payload = await decrypt(cookie);
+
+    if(!payload?.id){
         redirect('/signin');
     };
 
     return {
         isAuthenticated: true,
-        userId: decodedToken.id,
-        email: decodedToken.email,
-        username: decodedToken.username
+        userId: payload.id,
+        email: payload.email,
+        username: payload.username
     }
 });
 
-export const getUser = cache(async () => {
+export const fetchuser = cache(async () => {
     const userPayload = await verifyUser();
     if(!userPayload){
         return null;
