@@ -4,8 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
+interface UserProps {
+  id: number;
+  username: string;
+  email: string;
+  expiresAt: Date
+}
+
 const page = () => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState<UserProps>();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const handleGetUser = async () => {
@@ -16,8 +23,8 @@ const page = () => {
         router.push('/signin');
         return;
       };
-      console.log(user.data);
-      setUser(user.data);
+      console.log(user.data.user);
+      setUser(user.data.user);
     } catch (error) {
       console.error("Error while fetching user in cart: ", error);
       router.push('/signin');
@@ -33,7 +40,8 @@ const page = () => {
     <div>
       {loading ? "loading user data..." : (
         <div className="text-black">
-          {user}
+          {user?.username}
+          {user?.email}
         </div>
       )}
     </div>

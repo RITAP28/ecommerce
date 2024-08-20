@@ -23,6 +23,7 @@ export async function encrypt(payload: SessionPayload) {
 }
 
 export async function decrypt(token: string) {
+    console.log(token);
   try {
     const { payload } : {
         payload: PayloadProps
@@ -115,8 +116,6 @@ export async function getUser(token: string){
         if(!payload){
             throw new Error("Invalid token");
         };
-
-        console.log("payload email: ", payload.email);
 
         const existingUser = await prisma.user.findUnique({
             where: {

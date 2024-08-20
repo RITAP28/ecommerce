@@ -13,7 +13,6 @@ export const verifyUser = cache(async () => {
     if(!cookie){
         redirect('/signin');
     };
-    console.log(cookie);
 
     const payload = await decrypt(cookie);
 
