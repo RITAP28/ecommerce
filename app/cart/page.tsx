@@ -3,13 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-
-interface UserProps {
-  id: number;
-  username: string;
-  email: string;
-  expiresAt: Date
-}
+import { UserProps } from '../utils/fetchUser';
 
 const page = () => {
   const [user, setUser] = useState<UserProps>();

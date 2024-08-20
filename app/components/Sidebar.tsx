@@ -26,10 +26,7 @@ const onClick = (text: string) => {
 
 const Sidebar = async () => {
   return (
-    <div className='w-full h-full bg-black text-white'>
-      <div className={`w-full pb-6 pt-2 flex justify-center ${codePro.variable}`}>
-        <p className="">Welcome to SNARKK!</p>
-      </div>
+    <div className='w-full h-full bg-slate-500 text-black'>
       {Buttons.map((button, index) => (
         <>
         <ButtonComponent text={button.text} link={button.link} key={index} onClick={() => {
@@ -52,7 +49,7 @@ const ButtonComponent = ({ text, link } : {
     <>
     <div className="w-full flex justify-center">
       <Link href={link} className='w-full flex justify-center'>
-        <button type="button" className="w-[80%] hover:bg-slate-700 transition ease-in-out duration-200 px-2 py-1 rounded-md">
+        <button type="button" className="w-[80%] hover:bg-slate-700 transition-all hover:text-white ease-in-out duration-200 px-2 py-1 rounded-md font-Philosopher font-semibold">
           {text}
         </button>
       </Link>

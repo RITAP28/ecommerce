@@ -1,93 +1,88 @@
-import { prisma } from "@/db";
-import type { NextApiRequest, NextApiResponse } from "next";
+import mime from 'mime'
 import fs from "fs";
+import { mkdir, stat, writeFile } from "fs/promises";
 import path from "path";
 import { v4 as uuid } from "uuid";
 import sharp from "sharp";
-import multer from 'multer';
-import { NextResponse } from "next/server";
+import multer from "multer";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from '@/db';
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 export const config = {
-    api: {
-        bodyParser: false
-    }
+  api: {
+    bodyParser: false,
+  },
 };
 
 export async function GET() {
   return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   const randomId = uuid();
-  const {
-    productName,
-    productDescription,
-    productImage,
-    productPrice,
-  }: {
-    productName: string;
-    productDescription: string;
-    productImage: File;
-    productPrice: number;
-  } = req.body;
+  const formData = await req.formData();
+  const productName = formData.get("productName") as string;
+  const productDescription = formData.get("productDescription") as string;
+  const productPrice = parseFloat(formData.get("productPrice") as string);
+  const productImage = formData.get("productImage") as File;
 
-//     const form = new Promise((resolve, reject) => {
-//     upload.single('productImage')(req, res, (err: any) => {
-//       if (err) return reject(err);
-//       resolve(req.);
-//     });
-//   });
-
-  const pImagePath = path.join("public/pImages", randomId);
-
-  // validate inputs
   if (!productName || !productDescription || !productImage || !productPrice) {
-    throw new Error("All fields are required");
+    return NextResponse.json(
+      {
+        msg: "All fields are required",
+      },
+      {
+        status: 400, // Bad Request
+      }
+    );
   }
 
-  if (!fs.existsSync(pImagePath)) {
-    fs.mkdirSync(pImagePath, {
-      recursive: true,
+  // to save our Blob file to the disk we need to cast it to a Buffer
+  const buffer = Buffer.from(await productImage.arrayBuffer());
+  const relativeUploadDir = `/upload/${Date.now()}-${randomId}`;
+  const uploadDir = path.join("public", relativeUploadDir);
+
+  if(!fs.existsSync(uploadDir)){
+    fs.mkdirSync(uploadDir, {
+      recursive: true
     });
-  }
+  };
 
   try {
-    const resizedImageBuffer = await sharp(pImagePath)
-      .webp({
-        quality: 20,
-      })
-      .toBuffer();
-      await fs.promises.writeFile(`${pImagePath}.webp`, resizedImageBuffer);
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random())}`;
+    const filename = `${productImage.name.replace(/\.[^/.]+$/, "")}-${uniqueSuffix}.${mime.getExtension(productImage.type)}`;
 
-      const pImageLink = `http://localhost:3000/products/images/${path.basename(pImagePath)}.webp`;
-    // save product in the database
-    const newProduct = await prisma.product.create({
+    await writeFile(filename, buffer);
+
+    const productImageLink = `http://localhost:3000${relativeUploadDir}/${filename}`;
+
+    // saving the info in the Database
+    await prisma.product.create({
       data: {
         productName: productName,
         productDescription: productDescription,
-        productImage: pImageLink,
-        productPrice: productPrice,
-      },
+        productImage: productImageLink,
+        productPrice: productPrice
+      }
     });
 
-    console.log("New product data -> ", newProduct);
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Product added successfully",
-        newProdData: newProduct,
-      },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json({
+      msg: 'file created successfully'
+    },{
+      status: 200 // OK
+    });
   } catch (error) {
-    throw new Error("Error creating new product");
-  }
-}
+    console.error("Error while uploading via POST request: ", error);
+    return NextResponse.json({
+      msg: "Error while uploading via POST request"
+    },{
+      status: 500 // Internal Server Error
+    });
+  };
+};
 
 export async function PUT() {
   return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
