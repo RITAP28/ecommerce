@@ -31,6 +31,7 @@ const s3Client = new S3Client({
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const allProducts = await prisma.product.findMany();
+    console.log(allProducts);
     const imageLinks: Array<string> = [];
     for(const product of allProducts){
       const getCommand = new GetObjectCommand({
@@ -49,7 +50,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ 
       msg: "Image links generated successfully",
-      imageLinks: imageLinks
+      imageLinks: imageLinks,
+      allProducts: allProducts
     },{
       status: 200 // OK
     });
