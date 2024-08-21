@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 
 const page = () => {
   return (
-    <div className="w-full h-[92vh] bg-black">
-      <div className="w-full text-white flex justify-center">
+    <div className="w-full h-[92vh] bg-slate-500">
+      <div className="w-full text-black font-bold flex justify-center">
         <p className="pt-4 font-Philosopher">
           Here you can upload your product
         </p>
@@ -50,7 +50,7 @@ const UploadForm = () => {
           action=""
           onSubmit={handleUploadImage}
           method="post"
-          className="border-2 border-white px-8 py-6 bg-slate-500"
+          className="border-2 border-black px-8 py-6 bg-slate-500 rounded-lg"
         >
           <div className="w-full flex flex-col text-black">
             <div className="w-full pb-2">
@@ -90,7 +90,7 @@ const UploadForm = () => {
               />
             </div>
             <div className="w-full pt-4 pb-2 flex justify-center">
-              <SubmitButton text={`Upload`} />
+              <SubmitButton text={`Upload`} afterSubmitText={`Uploading...`} />
             </div>
           </div>
         </form>

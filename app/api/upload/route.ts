@@ -1,15 +1,13 @@
-import mime from 'mime'
-import fs from "fs";
-import { mkdir, stat, writeFile } from "fs/promises";
-import path from "path";
-import { v4 as uuid } from "uuid";
-import sharp from "sharp";
-import multer from "multer";
+import mime from "mime";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from '@/db';
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+import { prisma } from "@/db";
+import {
+  PutObjectCommand,
+  S3Client,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import sharp from "sharp";
 
 export const config = {
   api: {
@@ -17,12 +15,51 @@ export const config = {
   },
 };
 
-export async function GET() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-}
+const bucketName = process.env.BUCKET_NAME as string;
+const bucketRegion = process.env.BUCKET_REGION as string;
+const accessKey = process.env.ACCESS_KEY as string;
+const secretAccessKey = process.env.SECRET_ACCESS_KEY as string;
+
+const s3Client = new S3Client({
+  credentials: {
+    accessKeyId: accessKey,
+    secretAccessKey: secretAccessKey,
+  },
+  region: bucketRegion,
+});
+
+export async function GET(req: NextRequest, res: NextResponse) {
+  try {
+    const allProducts = await prisma.product.findMany();
+    const imageLinks: Array<string> = [];
+    for(const product of allProducts){
+      const getCommand = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: `${product.productImage}`
+      });
+      const signedUrl = await getSignedUrl(s3Client, getCommand, {
+        expiresIn: 60 * 60 * 24, // 1 day
+      });
+      imageLinks.push(signedUrl);
+    };
+
+    console.log(imageLinks);
+
+    // after 1 day, when the user sends a request to the server, it will again generate those pre-signed URLs whose expiration time will be increased by 1 more day
+
+    return NextResponse.json({ 
+      msg: "Image links generated successfully",
+      imageLinks: imageLinks
+    },{
+      status: 200 // OK
+    });
+  } catch (error) {
+    console.error("Error while fetching images from S3 bucket: ", error);
+    return NextResponse.json({  msg: "Internal Server Error" },{ status: 500 });
+  };
+};
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const randomId = uuid();
   const formData = await req.formData();
   const productName = formData.get("productName") as string;
   const productDescription = formData.get("productDescription") as string;
@@ -42,47 +79,65 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   // to save our Blob file to the disk we need to cast it to a Buffer
   const buffer = Buffer.from(await productImage.arrayBuffer());
-  const relativeUploadDir = `/upload/${Date.now()}-${randomId}`;
-  const uploadDir = path.join("public", relativeUploadDir);
-
-  if(!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir, {
-      recursive: true
-    });
-  };
 
   try {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random())}`;
-    const filename = `${productImage.name.replace(/\.[^/.]+$/, "")}-${uniqueSuffix}.${mime.getExtension(productImage.type)}`;
+    const filename = `${productImage.name.replace(
+      /\.[^/.]+$/,
+      ""
+    )}-${uniqueSuffix}.${mime.getExtension(productImage.type)}`;
 
-    await writeFile(filename, buffer);
+    console.log("buffer of the image uploaded: ", buffer);
 
-    const productImageLink = `http://localhost:3000${relativeUploadDir}/${filename}`;
+    const modifiedImageBuffer = await sharp(buffer)
+      .webp({
+        quality: 20,
+      })
+      .toBuffer();
+
+    const imageInsertedIntoS3 = {
+      Bucket: bucketName,
+      Key: filename,
+      Body: modifiedImageBuffer,
+      ContentType: mime.getExtension(productImage.type) as string | undefined,
+    };
+
+    const command = new PutObjectCommand(imageInsertedIntoS3);
+    await s3Client.send(command);
+
+    // saving the key/filename will be useful than the pre-signed url as we will be able to generate the url of the image whenever we need it
 
     // saving the info in the Database
-    await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         productName: productName,
         productDescription: productDescription,
-        productImage: productImageLink,
-        productPrice: productPrice
-      }
+        productImage: filename,
+        productPrice: productPrice,
+      },
     });
 
-    return NextResponse.json({
-      msg: 'file created successfully'
-    },{
-      status: 200 // OK
-    });
+    return NextResponse.json(
+      {
+        msg: "file created successfully",
+        productInfo: product
+      },
+      {
+        status: 200, // OK
+      }
+    );
   } catch (error) {
     console.error("Error while uploading via POST request: ", error);
-    return NextResponse.json({
-      msg: "Error while uploading via POST request"
-    },{
-      status: 500 // Internal Server Error
-    });
-  };
-};
+    return NextResponse.json(
+      {
+        msg: "Error while uploading via POST request",
+      },
+      {
+        status: 500, // Internal Server Error
+      }
+    );
+  }
+}
 
 export async function PUT() {
   return NextResponse.json({ error: "Method not allowed" }, { status: 405 });

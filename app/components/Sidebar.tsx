@@ -20,13 +20,30 @@ const Buttons = [
   }
 ];
 
+const Categories = [
+  {
+    text: 'Lifestyle Shoes'
+  },{
+    text: 'Running Shoes'
+  },{
+    text: 'Jordan'
+  },{
+    text: 'Sneakers'
+  },{
+    text: 'Basketball'
+  },{
+    text: 'Football'
+  }
+]
+
 const onClick = (text: string) => {
   redirect(`/${text}`);
 }
 
 const Sidebar = async () => {
   return (
-    <div className='w-full h-full bg-slate-500 text-black'>
+    <>
+    <div className='w-full h-full bg-slate-500 text-black border-r-2 border-black pt-[2rem]'>
       {Buttons.map((button, index) => (
         <>
         <ButtonComponent text={button.text} link={button.link} key={index} onClick={() => {
@@ -34,7 +51,22 @@ const Sidebar = async () => {
         }} />
         </>
       ))}
+      <div className="pt-[3rem] w-full">
+        <h3 className="underline flex justify-center font-bold font-Philosopher text-lg">
+          Categories
+        </h3>
+        <div className="w-full pt-4">
+          {Categories.map((category, index) => (
+            <>
+            <ButtonComponent text={category.text} link={category.text} key={index} onClick={() => {
+              onClick(category.text)
+            }} />
+            </>
+          ))}
+        </div>
+      </div>
     </div>
+    </>
   )
 }
 
