@@ -12,8 +12,7 @@ interface User {
 
 export async function sendtoken(
   user: User,
-  statusCode: number,
-  res: NextResponse
+  statusCode: number
 ) {
   const token = jwt.sign(
     {

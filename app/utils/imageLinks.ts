@@ -34,10 +34,6 @@ export const ImageLinks = async (imageName: string) => {
             productImageLink: signedUrl
         }
     });
-    return NextResponse.json({
-        msg: "Image link updated successfully",
-        signedUrl
-    },{ status: 200 });
   } catch (error) {
     console.error("Error while loading images: ", error);
     return NextResponse.json(

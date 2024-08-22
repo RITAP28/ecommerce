@@ -12,8 +12,9 @@ export async function GET(){
     });
 };
 
-export async function POST(req: NextRequest, res: NextResponse, state: FormState, formData: FormData){
+export async function POST(req: NextRequest){
     try {
+        const formData = await req.formData();
         const validatedFields = SignUpFormSchema.safeParse({
             name: formData.get('name'),
             email: formData.get('email'),
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest, res: NextResponse, state: FormState
                 isAuthenticated: true
             }
         });
-        await sendtoken(newUser, 200, res);
+        await sendtoken(newUser, 200);
         return NextResponse.json({
             msg: "User created successfully",
             newUser

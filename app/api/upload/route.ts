@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const allProducts = await prisma.product.findMany();
     console.log(allProducts);
     for(const product of allProducts){
-      ImageLinks(product.productName);
+      await ImageLinks(product.productName); // just generates the signed url and does not return any response data
     };
 
     // after 1 day, when the user sends a request to the server, it will again generate those pre-signed URLs whose expiration time will be increased by 1 more day
@@ -98,6 +98,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         productDescription: productDescription,
         productImage: filename,
         productPrice: productPrice,
+        createdAt: new Date(Date.now()),
+        updatedAt: new Date(Date.now())
       },
     });
 

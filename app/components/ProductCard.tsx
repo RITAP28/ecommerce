@@ -6,6 +6,9 @@ import { FaShoppingCart } from "react-icons/fa";
 import { AiFillThunderbolt } from "react-icons/ai";
 import Image from "next/image";
 import axios from "axios";
+import { UserProps } from "../utils/fetchUser";
+import { useRouter } from "next/navigation";
+import { handleAddToCart } from "../utils/utils";
 
 interface ProductProps {
   productId: number;
@@ -17,8 +20,35 @@ interface ProductProps {
 }
 
 const ProductCard = () => {
+  const router = useRouter();
   const [products, setProducts] = useState<ProductProps[]>([]);
   const [productsLoading, setProductsLoading] = useState<boolean>(true);
+  const [imageLoading, setImageLoading] = useState<boolean>(false);
+
+  const [user, setUser] = useState<UserProps>();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleGetUser = async () => {
+    setLoading(true);
+    try {
+      const user = await axios.get("/api/auth/validate");
+      if (!user) {
+        router.push("/signin");
+        return;
+      }
+      console.log(user.data.user);
+      setUser(user.data.user);
+    } catch (error) {
+      console.error("Error while fetching user in cart: ", error);
+      router.push("/signin");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    handleGetUser();
+  }, []);
+
   const handleGetAllProducts = async () => {
     try {
       const allProducts = await axios.get(`/api/upload`, {
@@ -33,7 +63,35 @@ const ProductCard = () => {
   };
 
   useEffect(() => {
-    handleGetAllProducts();
+    const timeout = setTimeout(async () => {
+      await handleGetAllProducts();
+    }, 4000);
+
+    const handleAllToCart = async ({ productId, productName, productDescription, productImageLink } : {
+      productId: number;
+      productName: string;
+      productDescription: string;
+      productImageLink: string;
+    }) => {
+      try {
+        const res = await axios.post(`/api/cart/${user?.id}`, {
+          productId,
+          productName,
+          productDescription,
+          productImageLink,
+          userId: user?.id,
+          userName: user?.username
+        });
+        console.log(res.data);
+      } catch (error) {
+        console.error("Error while adding to cart: ", error);
+      };
+    };
+
+    return () => {
+      clearTimeout(timeout);
+    };
+
   }, []);
 
   return (
@@ -58,9 +116,9 @@ const ProductCard = () => {
                   <div className="w-full">
                   <Image
                         key={index}
-                        src={product.productImageLink}
+                        src={`${product.productImageLink}`}
                         className="w-full h-[15rem] rounded-t-md"
-                        alt="watches"
+                        alt={product.productName}
                         width={50}
                         height={50}
                       />
@@ -80,6 +138,9 @@ const ProductCard = () => {
                       <button
                         type="button"
                         className="bg-black border-2 border-white text-white hover:bg-white hover:text-black transition ease-in-out duration-150 rounded-md w-[80%] py-2"
+                        onClick={() => {
+                          handleAddToCart(product.productId, product.productName, product.productDescription, product.productImageLink)
+                        }}
                       >
                         <span className="flex justify-center w-full gap-1">
                           <div className="w-[20%] flex items-center justify-center">

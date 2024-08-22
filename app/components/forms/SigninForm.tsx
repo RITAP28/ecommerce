@@ -42,7 +42,8 @@ const SigninForm = () => {
         duration: 4000,
         isClosable: true
       });
-      router.push('/');
+      const userId = result.user.id;
+      router.push(`/cart/${userId}`);
     };
 
     setPending(false);

@@ -11,7 +11,7 @@ export async function GET(){
     });
 };
 
-export async function POST(req: NextRequest, res: NextResponse){
+export async function POST(req: NextRequest){
     try {
         const { email, password } = await req.json();
         if(!email || !password){
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, res: NextResponse){
         },{
             status: 500 // Internal Server Error
         });
-        await sendtoken(existingUser, 200, res);
+        await sendtoken(existingUser, 200);
         return NextResponse.json({
             msg: "User logged in successfully"
         },{

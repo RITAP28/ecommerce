@@ -1,3 +1,6 @@
+'use server';
+
+import { prisma } from "@/db";
 import axios from "axios";
 import { NextResponse } from "next/server";
 
@@ -8,24 +11,19 @@ export interface UserProps {
     expiresAt: Date
   }
 
-export const handleFetchUser = async () => {
+export const handleFetchUser = async (userId: number) => {
     try {
-        const user = await axios.get(`/api/auth/validate`);
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
 
         if(!user){
-            return NextResponse.json({
-                msg: "User not found"
-            },{
-                status: 404 // Not found
-            });
+            return null;
         };
 
-        return NextResponse.json({
-            msg: "User successfully found",
-            user
-        },{
-            status: 200
-        });
+        return user;
     } catch (error) {
         console.error("Error while fetching user: ", error);
     };

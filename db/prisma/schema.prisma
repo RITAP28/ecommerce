@@ -33,23 +33,27 @@ model Session {
 }
 
 model Product {
-  productId          Int     @id @default(autoincrement())
-  productName        String  @unique
+  productId          Int      @id @default(autoincrement())
+  productName        String   @unique
   productDescription String?
   productPrice       Int
   productImage       String
-  productImageLink   String  @default("empty")
+  productImageLink   String   @default("empty")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime
 }
 
 model Cart {
   productId          Int
   productName        String
   productDescription String
-  productImage       String
+  productImageLink   String
   userId             Int
   userName           String
-  pQuantity          Int
-  user               User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  pQuantity          Int      @default(1)
+  addedAt            DateTime @default(now())
+  updatedAt          DateTime
+  user               User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 
   @@unique([productId, userId])
 }
