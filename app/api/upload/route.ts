@@ -8,6 +8,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import sharp from "sharp";
+import { ImageLinks } from "@/app/utils/imageLinks";
 
 export const config = {
   api: {
@@ -32,26 +33,17 @@ export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const allProducts = await prisma.product.findMany();
     console.log(allProducts);
-    const imageLinks: Array<string> = [];
     for(const product of allProducts){
-      const getCommand = new GetObjectCommand({
-        Bucket: bucketName,
-        Key: `${product.productImage}`
-      });
-      const signedUrl = await getSignedUrl(s3Client, getCommand, {
-        expiresIn: 60 * 60 * 24, // 1 day
-      });
-      imageLinks.push(signedUrl);
+      ImageLinks(product.productName);
     };
 
-    console.log(imageLinks);
+    const productsWithImageLinks = await prisma.product.findMany();
 
     // after 1 day, when the user sends a request to the server, it will again generate those pre-signed URLs whose expiration time will be increased by 1 more day
 
     return NextResponse.json({ 
       msg: "Image links generated successfully",
-      imageLinks: imageLinks,
-      allProducts: allProducts
+      productsWithImageLinks: productsWithImageLinks
     },{
       status: 200 // OK
     });

@@ -30,15 +30,15 @@ model Session {
   sessionToken String
   expiresAt    DateTime
   user         User     @relation(references: [id], fields: [userId], onDelete: Cascade)
-
 }
 
 model Product {
   productId          Int     @id @default(autoincrement())
-  productName        String
+  productName        String  @unique
   productDescription String?
   productPrice       Int
   productImage       String
+  productImageLink   String
 }
 
 model Cart {
