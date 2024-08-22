@@ -3,18 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/db";
 import {
   PutObjectCommand,
-  S3Client,
-  GetObjectCommand,
+  S3Client
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import sharp from "sharp";
 import { ImageLinks } from "@/app/utils/imageLinks";
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 const bucketName = process.env.BUCKET_NAME as string;
 const bucketRegion = process.env.BUCKET_REGION as string;
