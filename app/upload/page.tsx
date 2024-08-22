@@ -4,6 +4,7 @@ import React from "react";
 import { SubmitButton } from "../components/Button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useToast } from "@chakra-ui/react";
 
 const page = () => {
   return (
@@ -21,7 +22,8 @@ const page = () => {
 export default page;
 
 const UploadForm = () => {
-    const router = useRouter();
+  const toast = useToast();
+  const router = useRouter();
   const handleUploadImage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -30,16 +32,30 @@ const UploadForm = () => {
     });
 
     try {
-        const response = await axios.post('/api/upload', formData, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        console.log("Image uploaded successfully -> ", response.data);
-        router.push('/');
+      const response = await axios.post("/api/upload", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Image uploaded successfully -> ", response.data);
+      toast({
+        title: "Product Upload successfull",
+        description: "Your product has been uploaded. View it in our home page.",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+      router.push("/");
     } catch (error) {
-        console.error("Error while uploading image: ", error);
+      console.error("Error while uploading image: ", error);
+      toast({
+        title: "Product Upload failed",
+        description: "Your product has not been uploaded. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     }
   };
 
@@ -58,7 +74,7 @@ const UploadForm = () => {
               <input
                 type="text"
                 name="productName"
-                className="w-full py-2 pl-1 text-black font-Code text-sm"
+                className="w-full py-2 pl-1 text-black font-Code text-sm rounded-sm"
                 placeholder="Enter product name"
               />
             </div>
@@ -68,7 +84,7 @@ const UploadForm = () => {
               </p>
               <textarea
                 name="productDescription"
-                className="w-full pl-1 text-black font-Code text-sm"
+                className="w-full pl-1 text-black font-Code text-sm rounded-sm"
                 placeholder="Enter product description"
               />
             </div>
@@ -77,7 +93,7 @@ const UploadForm = () => {
               <input
                 type="file"
                 name="productImage"
-                className="w-full font-Code text-sm"
+                className="w-full font-Code text-sm rounded-sm"
               />
             </div>
             <div className="w-full py-2">
@@ -85,7 +101,7 @@ const UploadForm = () => {
               <input
                 type="number"
                 name="productPrice"
-                className="w-full py-2 pl-1 text-black font-Code text-sm"
+                className="w-full py-2 pl-1 text-black font-Code text-sm rounded-sm"
                 placeholder="Product price"
               />
             </div>

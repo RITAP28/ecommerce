@@ -12,7 +12,7 @@ export const SigninField = ({
     return (
       <>
         <div className="w-full flex flex-col">
-          <p className="text-white pb-1 font-Philosopher">{text}:</p>
+          <p className="text-black pb-1 font-Philosopher">{text}:</p>
           <input
             type={type}
             name={name}

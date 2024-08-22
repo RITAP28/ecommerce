@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { UserProps } from '../utils/fetchUser';
 
-const page = () => {
+const Page = () => {
   const [user, setUser] = useState<UserProps>();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -31,15 +31,20 @@ const page = () => {
   }, []);
 
   return (
-    <div>
-      {loading ? "loading user data..." : (
-        <div className="text-black">
-          {user?.username}
-          {user?.email}
+    <div className='w-full h-full bg-slate-500'>
+      {loading ? (
+        <div className="font-Philosopher pl-2 pt-2">
+          checking if you are authenticated...
+        </div>
+      ) : (
+        <div className="text-black font-Philosopher">
+          <p className="pl-2 pt-2">
+            {`Your cart seems empty :( Continue shopping...`}
+          </p>
         </div>
       )}
     </div>
   )
 }
 
-export default page
+export default Page

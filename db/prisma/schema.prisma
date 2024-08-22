@@ -38,7 +38,7 @@ model Product {
   productDescription String?
   productPrice       Int
   productImage       String
-  productImageLink   String
+  productImageLink   String  @default("empty")
 }
 
 model Cart {

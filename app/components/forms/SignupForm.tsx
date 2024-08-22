@@ -6,8 +6,10 @@ import { SubmitButton } from "../Button";
 import { signup } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast } from '@chakra-ui/react'
 
 const SignupForm = () => {
+  const toast = useToast();
   const [state, setState] = useState<any>({});
   const [data, setData] = useState({
     username: '',
@@ -40,10 +42,23 @@ const SignupForm = () => {
 
     if (result?.errors) {
       setState({ ...state, errors: result.errors });
+      toast({
+        title: "Registration failed.",
+        description: "Apologies from our side. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     } else {
       setPending(false);
       setState({ ...state, errors: {} });
-      alert("Registration successfull");
+      toast({
+        title: "You are signed up!",
+        description: "Your account has been created.",
+        status: "success",
+        duration: 4000,
+        isClosable: true
+      });
       router.push("/cart");
     }
 
@@ -52,7 +67,7 @@ const SignupForm = () => {
 
   return (
     <>
-      <form id="signupform" onSubmit={handleSubmit} className="border-2 border-white px-8 py-6">
+      <form id="signupform" onSubmit={handleSubmit} className="border-2 border-black px-8 py-6">
         <div className="pb-4">
           <SignupField
             type={`username`}
@@ -93,12 +108,15 @@ const SignupForm = () => {
           </div>
         )}
         <div className="w-full pt-4 pb-2 flex justify-center">
-          <SubmitButton text={`Register`} isPending={pending} />
+          <SubmitButton text={`Register`} isPending={pending} afterSubmitText={`Signing you up...`} />
         </div>
-        <div className="w-full text-white">
+        <div className="w-full flex justify-center">
+          <p className="font-Philosopher">OR</p>
+        </div>
+        <div className="w-full text-black flex flex-row justify-center font-Philosopher gap-1">
             <p className="">Already have an account?</p>
             <p className="">
-              <Link href='/signup' className=''>
+              <Link href='/signin' className='underline hover:text-white transition-all ease-in-out duration-200'>
                 Login
               </Link>
             </p>

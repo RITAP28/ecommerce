@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { handleFetchUser, UserProps } from "../utils/fetchUser";
-import { redirect, useRouter } from "next/navigation";
+import { UserProps } from "../utils/fetchUser";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -74,11 +74,11 @@ const Header = () => {
           </Link>
         </div>
         <div className="basis-1/4 w-full flex justify-center items-center">
-          {user === null ? (
-            <div className="">
+          {!user ? (
+            <div className="font-Philosopher font-extrabold border-2 border-black text-white px-2 py-1 bg-black">
               <Link
                 href="/signin"
-                className="hover:text-white transition-all ease-in-out duration-150 px-2 py-1 rounded-md font-Philosopher font-bold lowercase"
+                className=""
               >
                 Login
               </Link>

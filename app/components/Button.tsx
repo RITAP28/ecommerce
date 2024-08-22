@@ -4,7 +4,7 @@ const Button = ({ text, onClick }: { text: string, onClick: () => void }) => {
   return (
     <button
       type="button"
-      className="px-6 py-2 bg-black text-white hover:bg-white hover:text-black border-2 border-white rounded-sm transition ease-in-out duration-200"
+      className="px-6 py-1 bg-slate-500 text-white hover:bg-white hover:text-black border-2 border-black rounded-md transition ease-in-out duration-200 font-Philosopher"
       onClick={onClick}
     >
       {text}
@@ -18,7 +18,7 @@ const SubmitButton = ({ text, isPending, afterSubmitText } : {
   afterSubmitText: string
 }) => {
   return (
-    <button aria-disabled={isPending} type="submit" className="px-6 py-2 font-Philosopher bg-black text-white hover:bg-white hover:text-black border-2 border-white rounded-lg transition ease-in-out duration-200">
+    <button aria-disabled={isPending} type="submit" className="px-6 py-1 font-Philosopher bg-slate-500 text-white hover:bg-white hover:text-black border-2 border-black rounded-md transition ease-in-out duration-200">
       {isPending ? afterSubmitText : text}
     </button>
   )

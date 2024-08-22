@@ -25,7 +25,7 @@ const ProductCard = () => {
         withCredentials: true,
       });
       console.log(allProducts.data);
-      setProducts(allProducts.data.productsWithImageLinks);
+      setProducts(allProducts.data.allProducts);
     } catch (error) {
       console.error("Error while fetching all products: ", error);
     }

@@ -37,13 +37,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
       ImageLinks(product.productName);
     };
 
-    const productsWithImageLinks = await prisma.product.findMany();
-
     // after 1 day, when the user sends a request to the server, it will again generate those pre-signed URLs whose expiration time will be increased by 1 more day
 
     return NextResponse.json({ 
       msg: "Image links generated successfully",
-      productsWithImageLinks: productsWithImageLinks
+      allProducts: allProducts
     },{
       status: 200 // OK
     });
