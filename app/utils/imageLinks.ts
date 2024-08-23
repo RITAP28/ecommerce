@@ -23,7 +23,7 @@ export const ImageLinks = async (imageName: string) => {
         Key: imageName
     });
     const signedUrl = await getSignedUrl(s3Client, getCommand, {
-        expiresIn: 60 * 60 * 24, // 1 day
+        expiresIn: 24 * 60 * 60
     });
     console.log("signed url: ", signedUrl);
     await prisma.product.update({
@@ -31,7 +31,8 @@ export const ImageLinks = async (imageName: string) => {
             productName: imageName
         },
         data: {
-            productImageLink: signedUrl
+            productImageLink: signedUrl,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
         }
     });
   } catch (error) {

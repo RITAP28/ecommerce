@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { SubmitButton } from "../components/Button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -24,8 +24,12 @@ export default page;
 const UploadForm = () => {
   const toast = useToast();
   const router = useRouter();
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false);
+
+
   const handleUploadImage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setUploadLoading(true);
     const formData = new FormData(e.currentTarget);
     formData.forEach((key, value) => {
       console.log(key, value);
@@ -56,7 +60,8 @@ const UploadForm = () => {
         duration: 4000,
         isClosable: true,
       });
-    }
+    };
+    setUploadLoading(false);
   };
 
   return (
@@ -106,7 +111,7 @@ const UploadForm = () => {
               />
             </div>
             <div className="w-full pt-4 pb-2 flex justify-center">
-              <SubmitButton text={`Upload`} afterSubmitText={`Uploading...`} />
+              <SubmitButton text={`Upload`} afterSubmitText={`Uploading...`} isPending={uploadLoading} />
             </div>
           </div>
         </form>

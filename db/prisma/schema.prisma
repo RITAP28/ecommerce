@@ -40,7 +40,8 @@ model Product {
   productImage       String
   productImageLink   String   @default("empty")
   createdAt          DateTime @default(now())
-  updatedAt          DateTime
+  updatedAt          DateTime @default(now())
+  expiresAt          DateTime @default(now())
 }
 
 model Cart {

@@ -88,8 +88,8 @@ const Sidebar = () => {
         description: "Sad to see you go, come back soon!",
         status: "success",
         duration: 4000,
-        isClosable: true
-      })
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error while logging out: ", error);
       toast({
@@ -97,9 +97,9 @@ const Sidebar = () => {
         description: "Sorry, we could not log you out. Please try again.",
         status: "error",
         duration: 4000,
-        isClosable: true
+        isClosable: true,
       });
-    };
+    }
   };
 
   return (
@@ -107,16 +107,15 @@ const Sidebar = () => {
       <div className="w-full h-full bg-slate-500 text-black border-r-2 border-black pt-[2rem] flex flex-col">
         <div className="w-full">
           {Buttons.map((button, index) => (
-            <>
-              <ButtonComponent
-                text={button.text}
-                link={button.link}
-                key={index}
-                onClick={() => {
-                  onClick(button.text);
-                }}
-              />
-            </>
+              <div className="" key={index}>
+                <ButtonComponent
+                  text={button.text}
+                  link={button.link}
+                  onClick={() => {
+                    onClick(button.text);
+                  }}
+                />
+              </div>
           ))}
         </div>
         <div className="pt-[3rem] w-full">
@@ -125,16 +124,15 @@ const Sidebar = () => {
           </h3>
           <div className="w-full pt-4">
             {Categories.map((category, index) => (
-              <>
-                <ButtonComponent
-                  text={category.text}
-                  link={category.text}
-                  key={index}
-                  onClick={() => {
-                    onClick(category.text);
-                  }}
-                />
-              </>
+                <div className="" key={index}>
+                  <ButtonComponent
+                    text={category.text}
+                    link={category.text}
+                    onClick={() => {
+                      onClick(category.text);
+                    }}
+                  />
+                </div>
             ))}
           </div>
         </div>

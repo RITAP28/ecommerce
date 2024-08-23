@@ -1,14 +1,12 @@
 "use client"; // Add this line at the top of your component
 
 import React, { useEffect, useState } from "react";
-import { products } from "../lib/data";
 import { FaShoppingCart } from "react-icons/fa";
 import { AiFillThunderbolt } from "react-icons/ai";
 import Image from "next/image";
 import axios from "axios";
 import { UserProps } from "../utils/fetchUser";
 import { useRouter } from "next/navigation";
-import { handleAddToCart } from "../utils/utils";
 
 interface ProductProps {
   productId: number;
@@ -62,31 +60,26 @@ const ProductCard = () => {
     setProductsLoading(false);
   };
 
+  const handleAddToCart = async (productId: number, productName: string, productDescription: string, productImageLink: string) => {
+    try {
+      const res = await axios.post(`/api/cart/${user?.id}`, {
+        productId,
+        productName,
+        productDescription,
+        productImageLink,
+        userId: user?.id,
+        userName: user?.username
+      });
+      console.log(res.data);
+    } catch (error) {
+      console.error("Error while adding to cart: ", error);
+    };
+  };
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await handleGetAllProducts();
     }, 4000);
-
-    const handleAllToCart = async ({ productId, productName, productDescription, productImageLink } : {
-      productId: number;
-      productName: string;
-      productDescription: string;
-      productImageLink: string;
-    }) => {
-      try {
-        const res = await axios.post(`/api/cart/${user?.id}`, {
-          productId,
-          productName,
-          productDescription,
-          productImageLink,
-          userId: user?.id,
-          userName: user?.username
-        });
-        console.log(res.data);
-      } catch (error) {
-        console.error("Error while adding to cart: ", error);
-      };
-    };
 
     return () => {
       clearTimeout(timeout);
@@ -96,7 +89,7 @@ const ProductCard = () => {
 
   return (
     <div className="w-full h-full overflow-y-auto pb-[2rem] scroll-smooth">
-      <div className="grid grid-flow-cols grid-cols-4 gap-x-2 gap-y-6 pt-4 px-2 overflow-y-hidden">
+      <div className="grid grid-cols-4 grid-rows-3 gap-4 pt-4 px-2 overflow-y-hidden">
         {productsLoading ? (
           <>
             <div className="w-full flex justify-center">
@@ -106,8 +99,7 @@ const ProductCard = () => {
             </div>
           </>
         ) : (
-          <div className="w-full h-full overflow-visible">
-            {products.length > 0 ? (
+            products.length > 0 ? (
               products.map((product, index) => (
                 <div
                   className="relative hover:z-20 z-10 bg-slate-600 rounded-md transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:cursor-pointer"
@@ -119,12 +111,12 @@ const ProductCard = () => {
                         src={`${product.productImageLink}`}
                         className="w-full h-[15rem] rounded-t-md"
                         alt={product.productName}
-                        width={50}
-                        height={50}
+                        width={80}
+                        height={80}
                       />
                   </div>
                   <div
-                    className={`w-full text-white pt-1 pl-1 text-xl font-semibold font-Code flex justify-center`}
+                    className={`w-full text-white pt-3 pl-1 text-sm font-semibold font-Code flex justify-center`}
                   >
                     {product.productName}
                   </div>
@@ -178,8 +170,7 @@ const ProductCard = () => {
                   </div>
                 </div>
               </>
-            )}
-          </div>
+            )
         )}
       </div>
     </div>

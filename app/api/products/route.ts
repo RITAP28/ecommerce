@@ -90,7 +90,7 @@ export async function POST(req: NextRequest ) {
         productId,
         productName,
         productDescription,
-        productImage,
+        productImageLink,
         userName: user.username,
         pQuantity: 1,
       },

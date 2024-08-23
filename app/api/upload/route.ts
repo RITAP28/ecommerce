@@ -2,11 +2,13 @@ import mime from "mime";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/db";
 import {
+  GetObjectCommand,
   PutObjectCommand,
-  S3Client
+  S3Client,
 } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 import { ImageLinks } from "@/app/utils/imageLinks";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const bucketName = process.env.BUCKET_NAME as string;
 const bucketRegion = process.env.BUCKET_REGION as string;
@@ -23,25 +25,41 @@ const s3Client = new S3Client({
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
-    const allProducts = await prisma.product.findMany();
-    console.log(allProducts);
-    for(const product of allProducts){
-      await ImageLinks(product.productName); // just generates the signed url and does not return any response data
-    };
+    const expiredLinkProducts = await prisma.product.findMany({
+      where: {
+        expiresAt: {
+          lt: new Date(),
+        },
+      },
+    });
+    console.log(expiredLinkProducts);
+    for (const product of expiredLinkProducts) {
+      // update the product's image link by creating another signed url
+      try {
+        await ImageLinks(product.productName);
+      } catch (error) {
+        console.error("Error while creating signed url: ", error);
+      }
+    }
 
     // after 1 day, when the user sends a request to the server, it will again generate those pre-signed URLs whose expiration time will be increased by 1 more day
 
-    return NextResponse.json({ 
-      msg: "Image links generated successfully",
-      allProducts: allProducts
-    },{
-      status: 200 // OK
-    });
+    const allProducts = await prisma.product.findMany();
+
+    return NextResponse.json(
+      {
+        msg: "Image links generated successfully",
+        allProducts: allProducts,
+      },
+      {
+        status: 200, // OK
+      }
+    );
   } catch (error) {
     console.error("Error while fetching images from S3 bucket: ", error);
-    return NextResponse.json({  msg: "Internal Server Error" },{ status: 500 });
-  };
-};
+    return NextResponse.json({ msg: "Internal Server Error" }, { status: 500 });
+  }
+}
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const formData = await req.formData();
@@ -61,6 +79,24 @@ export async function POST(req: NextRequest, res: NextResponse) {
     );
   }
 
+  // check for duplicate product names
+  const existingProduct = await prisma.product.findUnique({
+    where: {
+      productName: productName,
+    },
+  });
+
+  if (existingProduct) {
+    return NextResponse.json(
+      {
+        msg: `Product with name ${productName} already exists`,
+      },
+      {
+        status: 409, // Conflict
+      }
+    );
+  }
+
   // to save our Blob file to the disk we need to cast it to a Buffer
   const buffer = Buffer.from(await productImage.arrayBuffer());
 
@@ -74,8 +110,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     console.log("buffer of the image uploaded: ", buffer);
 
     const modifiedImageBuffer = await sharp(buffer)
+      .resize(800, 600, { fit: "inside", withoutEnlargement: true })
       .webp({
-        quality: 20,
+        quality: 80,
       })
       .toBuffer();
 
@@ -89,6 +126,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const command = new PutObjectCommand(imageInsertedIntoS3);
     await s3Client.send(command);
 
+    const getCommand = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: filename,
+    });
+
+    const signedUrl = await getSignedUrl(s3Client, getCommand, {
+      expiresIn: 24 * 60 * 60
+    });
+    console.log("Signed URL: ", signedUrl);
+
     // saving the key/filename will be useful than the pre-signed url as we will be able to generate the url of the image whenever we need it
 
     // saving the info in the Database
@@ -98,15 +145,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
         productDescription: productDescription,
         productImage: filename,
         productPrice: productPrice,
+        productImageLink: signedUrl,
         createdAt: new Date(Date.now()),
-        updatedAt: new Date(Date.now())
+        updatedAt: new Date(Date.now()),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
     });
 
     return NextResponse.json(
       {
         msg: "file created successfully",
-        productInfo: product
+        productInfo: product,
       },
       {
         status: 200, // OK

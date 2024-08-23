@@ -1,16 +1,10 @@
-'use server'
-
-import { auth } from "@/auth";
 import axios from "axios";
 import { redirect } from "next/navigation";
 
 export const handleAddToCart = async (productId: number, productName: string, productDescription: string, productImage: string) => {
   try {
-    const session = await auth();
-    console.log(session);
-    const email = session?.user?.email;
-    console.log(email);
-    if (!session) {
+    const user = await axios.get(`/api/auth/validate`);
+    if (!user) {
       redirect(`${process.env.NEXT_PUBLIC_API_URL}/signin`);
     } else {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
@@ -22,7 +16,7 @@ export const handleAddToCart = async (productId: number, productName: string, pr
         withCredentials: true
       });
       console.log("product added to cart successfully -> ", res.data);
-    }
+    };
   } catch (error) {
     console.error("Error while adding product to cart: ", error);
   };
@@ -30,10 +24,10 @@ export const handleAddToCart = async (productId: number, productName: string, pr
 
 export const handleGetUser = async () => {
   try {
-    const user = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
+    const user = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/validate`, {
       withCredentials: true
     });
-    console.log("user found -> ", user);
+    console.log("user found -> ", user.data.user);
   } catch (error) {
     console.error("Error while getting user: ", error);
   };
