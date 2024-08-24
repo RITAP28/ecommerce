@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { UserProps } from "../../utils/fetchUser";
 import { CartProps } from "@/app/utils/props";
 import Image from "next/image";
 import { FaHeart } from "react-icons/fa";
@@ -19,7 +18,6 @@ const Page = ({
 }) => {
   const { userId } = params;
   const toast = useToast();
-  const [user, setUser] = useState<UserProps>();
   const [cart, setCart] = useState<CartProps[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -83,6 +81,21 @@ const Page = ({
         isClosable: true
       });
     }
+  };
+
+  const handleAddToWishlist = async (productId: number, productName: string, productDescription: string, productImageLink: string) => {
+    try {
+      const product = await axios.post(`/api/wishlist/${userId}`, {
+        productId,
+        productName,
+        productDescription,
+        productImageLink,
+        userId: user?.id as number,
+        userName: user?.username as string
+      })
+    } catch (error) {
+      console.error("Error while adding to wishlist: ", error);
+    };
   };
 
   return (
@@ -153,7 +166,9 @@ const Page = ({
                         </div>
                         <div className="w-full flex flex-row pl-4">
                           <div className="">
-                            <button type="button" className="">
+                            <button type="button" className="" onClick={() => {
+                              handleAddToWishlist(product.productId, product.productName, product.productDescription, product.productImageLink)
+                            }}>
                               <FaHeart className="text-[1.5rem]" />
                             </button>
                           </div>

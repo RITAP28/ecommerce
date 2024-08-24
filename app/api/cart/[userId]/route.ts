@@ -126,10 +126,10 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    console.error("Error while adding product to request: ", error);
+    console.error("Error while adding product to cart: ", error);
     return NextResponse.json(
       {
-        msg: "Error while adding product to request",
+        msg: "Error while adding product to cart",
       },
       {
         status: 500, // Internal Server Error

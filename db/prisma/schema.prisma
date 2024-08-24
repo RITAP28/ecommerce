@@ -66,12 +66,9 @@ model Wishlist {
   productName        String
   productDescription String
   productImageLink   String
-  productPrice       Int
   userId             Int
   userName           String
-  pQuantity          Int      @default(1)
   addedAt            DateTime @default(now())
-  updatedAt          DateTime
   user               User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 
   @@unique([productId, userId])

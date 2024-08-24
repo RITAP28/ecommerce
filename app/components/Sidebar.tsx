@@ -97,7 +97,7 @@ const Sidebar = () => {
     },
     {
       text: "Your Wishlist",
-      link: "/wishlist",
+      link: `/wishlist/${user?.id}`,
     },
     {
       text: "Upload Product",
