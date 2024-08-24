@@ -49,6 +49,7 @@ model Cart {
   productName        String
   productDescription String
   productImageLink   String
+  productPrice       Int
   userId             Int
   userName           String
   pQuantity          Int      @default(1)

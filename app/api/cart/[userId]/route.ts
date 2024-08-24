@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
       productName,
       productDescription,
       productImageLink,
+      productPrice,
       userId,
       userName,
     }: {
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
       productName: string;
       productDescription: string;
       productImageLink: string;
+      productPrice: number;
       userId: number;
       userName: string;
     } = await req.json();
@@ -101,6 +103,7 @@ export async function POST(req: NextRequest) {
         productName,
         productDescription,
         productImageLink,
+        productPrice,
         userId,
         userName,
         addedAt: new Date(Date.now()),

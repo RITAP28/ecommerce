@@ -66,13 +66,14 @@ const ProductCard = () => {
     setProductsLoading(false);
   };
 
-  const handleAddToCart = async (productId: number, productName: string, productDescription: string, productImageLink: string) => {
+  const handleAddToCart = async (productId: number, productName: string, productDescription: string, productImageLink: string, productPrice: number) => {
     try {
       const res = await axios.post(`/api/cart/${user?.id}`, {
         productId,
         productName,
         productDescription,
         productImageLink,
+        productPrice,
         userId: user?.id as number,
         userName: user?.username as string
       });
@@ -164,7 +165,7 @@ const ProductCard = () => {
                         type="button"
                         className="bg-black border-2 border-white text-white hover:bg-white hover:text-black transition ease-in-out duration-150 rounded-md w-[80%] py-2"
                         onClick={() => {
-                          handleAddToCart(product.productId, product.productName, product.productDescription, product.productImageLink)
+                          handleAddToCart(product.productId, product.productName, product.productDescription, product.productImageLink, product.productPrice)
                         }}
                       >
                         <span className="flex justify-center w-full gap-1">
