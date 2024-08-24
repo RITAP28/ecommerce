@@ -59,7 +59,8 @@ const SignupForm = () => {
         duration: 4000,
         isClosable: true
       });
-      router.push("/cart");
+      const userId = result.user.id as number;
+      router.push(`/cart/${userId}`);
     }
 
     setPending(false);

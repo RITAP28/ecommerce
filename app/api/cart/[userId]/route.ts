@@ -1,4 +1,5 @@
 import { handleFetchUser } from "@/app/utils/fetchUser";
+import { getProductInCart } from "@/app/utils/utils";
 import { prisma } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,7 +27,11 @@ export async function GET(
       );
     }
 
-    const cartProducts = await prisma.cart.findMany();
+    const cartProducts = await prisma.cart.findMany({
+      where: {
+        userId: Number(userId)
+      }
+    });
     return NextResponse.json(
       {
         msg: "Products found successfully in cart",
@@ -125,6 +130,70 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         msg: "Error while adding product to request",
+      },
+      {
+        status: 500, // Internal Server Error
+      }
+    );
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      userId: number;
+    };
+  }
+) {
+  const { userId } = params;
+  const user = await handleFetchUser(userId);
+  if (user === null || user === undefined) {
+    return NextResponse.json(
+      {
+        msg: "User not found",
+      },
+      {
+        status: 401,
+      }
+    );
+  }
+
+  const { productId }: { productId: number } = await req.json();
+  try {
+    const existingProduct = await getProductInCart(productId, userId);
+    if (existingProduct === null || existingProduct === undefined) {
+      return NextResponse.json(
+        {
+          msg: "Product not found in cart",
+        },
+        {
+          status: 404, // Not Found
+        }
+      );
+    }
+
+    await prisma.cart.delete({
+      where: {
+        productId_userId: {
+          productId,
+          userId: Number(userId),
+        },
+      },
+    });
+
+    return NextResponse.json({
+      msg: "Product deleted successfully"
+    },{
+      status: 200 // OK
+    });
+  } catch (error) {
+    console.error("Error while deleting product from cart: ", error);
+    return NextResponse.json(
+      {
+        msg: "Error while deleting product from cart",
       },
       {
         status: 500, // Internal Server Error

@@ -1,3 +1,6 @@
+'use server'
+
+import { prisma } from "@/db";
 import axios from "axios";
 import { redirect } from "next/navigation";
 
@@ -33,3 +36,22 @@ export const handleGetUser = async () => {
   };
 };
 
+export const getProductInCart = async (productId: number, userId: number) => {
+  try {
+    const existingProduct = await prisma.cart.findUnique({
+      where: {
+        productId_userId: {
+          productId: productId,
+          userId: Number(userId)
+        }
+      }
+    });
+    if(!existingProduct){
+      return null;
+    };
+
+    return existingProduct;
+  } catch (error) {
+    console.error("Error while fetching product: ", error);
+  };
+};

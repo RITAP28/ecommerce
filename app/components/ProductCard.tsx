@@ -32,20 +32,12 @@ const ProductCard = () => {
     try {
       const user = await axios.get("/api/auth/validate");
       if (!user) {
-        router.push("/signin");
-        toast({
-          title: "Sorry, you have to login first",
-          status: 'info',
-          isClosable: true,
-          duration: 4000
-        });
         return;
-      }
+      };
       console.log(user.data.user);
       setUser(user.data.user);
     } catch (error) {
       console.error("Error while fetching user: ", error);
-      router.push("/signin");
     }
   };
 

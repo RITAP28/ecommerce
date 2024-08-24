@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
+  id              Int        @id @default(autoincrement())
   username        String
-  email           String    @unique
+  email           String     @unique
   password        String
-  isAuthenticated Boolean   @default(false)
-  isVerified      Boolean   @default(false)
+  isAuthenticated Boolean    @default(false)
+  isVerified      Boolean    @default(false)
   Session         Session[]
   Cart            Cart[]
+  Wishlist        Wishlist[]
 }
 
 model Session {
@@ -45,6 +46,22 @@ model Product {
 }
 
 model Cart {
+  productId          Int
+  productName        String
+  productDescription String
+  productImageLink   String
+  productPrice       Int
+  userId             Int
+  userName           String
+  pQuantity          Int      @default(1)
+  addedAt            DateTime @default(now())
+  updatedAt          DateTime
+  user               User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@unique([productId, userId])
+}
+
+model Wishlist {
   productId          Int
   productName        String
   productDescription String
