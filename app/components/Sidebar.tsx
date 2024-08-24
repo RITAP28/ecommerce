@@ -3,29 +3,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
-import { UserProps } from "../utils/fetchUser";
+import { handleGetUser, UserProps } from "../utils/fetchUser";
 import axios from "axios";
 import { Button } from "./Button";
 import { useToast } from "@chakra-ui/react";
 
-const Buttons = [
-  {
-    text: "Your Cart",
-    link: "/cart",
-  },
-  {
-    text: "Your Orders",
-    link: "/orders",
-  },
-  {
-    text: "Your Wishlist",
-    link: "/wishlist",
-  },
-  {
-    text: "Upload Product",
-    link: "/upload",
-  },
-];
+
 
 const Categories = [
   {
@@ -55,6 +38,7 @@ const onClick = (text: string) => {
 const Sidebar = () => {
   const toast = useToast();
   const router = useRouter();
+
   const [user, setUser] = useState<UserProps>();
   const [userLoading, setUserLoading] = useState<boolean>(false);
 
@@ -101,6 +85,25 @@ const Sidebar = () => {
       });
     }
   };
+
+  const Buttons = [
+    {
+      text: "Your Cart",
+      link: `/cart/${user?.id}`,
+    },
+    {
+      text: "Your Orders",
+      link: "/orders",
+    },
+    {
+      text: "Your Wishlist",
+      link: "/wishlist",
+    },
+    {
+      text: "Upload Product",
+      link: "/upload",
+    },
+  ];
 
   return (
     <>

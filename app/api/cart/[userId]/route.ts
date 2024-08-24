@@ -2,59 +2,121 @@ import { handleFetchUser } from "@/app/utils/fetchUser";
 import { prisma } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, {
-  params
-} : {
-  params: {
-    userId: number
+export async function GET(
+  req: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      userId: number;
+    };
   }
-}) {
-  const { userId } = params;
+) {
+  try {
+    const { userId } = params;
+    const user = await handleFetchUser(userId);
+    if (user === null || user === undefined) {
+      return NextResponse.json(
+        {
+          msg: "User not found",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    const cartProducts = await prisma.cart.findMany();
+    return NextResponse.json(
+      {
+        msg: "Products found successfully in cart",
+        cartProducts,
+      },
+      {
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error while fetching products in cart: ", error);
+    return NextResponse.json(
+      { msg: "Error while fetching products" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
   try {
     const {
       productId,
       productName,
       productDescription,
       productImageLink,
-      // userId,
+      userId,
       userName,
     }: {
       productId: number;
       productName: string;
       productDescription: string;
       productImageLink: string;
-      // userId: number;
+      userId: number;
       userName: string;
     } = await req.json();
 
     const user = await handleFetchUser(userId);
-    if(user === null || user === undefined){
-      return NextResponse.json({
-        msg: "User not found"
-      },{
-        status: 401 
-      });
-    };
+    if (user === null || user === undefined) {
+      return NextResponse.json(
+        {
+          msg: "User not found",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
 
-    const newProdinCart = await prisma.cart.create({
+    const existingProductInCart = await prisma.cart.findUnique({
+      where: {
+        productId_userId: {
+          productId,
+          userId,
+        },
+      },
+    });
+
+    if (existingProductInCart) {
+      return NextResponse.json(
+        {
+          msg: "Product already in cart",
+        },
+        {
+          status: 409, // Conflict
+        }
+      );
+    }
+
+    const newProductInCart = await prisma.cart.create({
       data: {
         productId,
         productName,
         productDescription,
         productImageLink,
         userId,
-        userName: user.username as string,
+        userName,
         addedAt: new Date(Date.now()),
-        updatedAt: new Date(Date.now())
-      }
+        updatedAt: new Date(Date.now()),
+      },
     });
 
-    return NextResponse.json({
-      msg: "Product added to cart successfully",
-      newProdinCart: newProdinCart
-    },{
-      status: 201, // Created
-    });
+    return NextResponse.json(
+      {
+        msg: "Product added to cart successfully",
+        newProdinCart: newProductInCart,
+      },
+      {
+        status: 201, // Created
+      }
+    );
   } catch (error) {
     console.error("Error while adding product to request: ", error);
     return NextResponse.json(

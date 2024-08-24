@@ -15,7 +15,7 @@ export const handleFetchUser = async (userId: number) => {
     try {
         const user = await prisma.user.findUnique({
             where: {
-                id: userId
+                id: Number(userId)
             }
         });
 
@@ -28,3 +28,15 @@ export const handleFetchUser = async (userId: number) => {
         console.error("Error while fetching user: ", error);
     };
 };
+
+export const handleGetUser = async () => {
+    try {
+        const user = await axios.get(`/api/auth/validate`);
+        if(!user){
+            return null;
+        };
+        return user.data.user as UserProps;
+    } catch (error) {
+        console.error("Error while getting user: ", error);
+    }
+}

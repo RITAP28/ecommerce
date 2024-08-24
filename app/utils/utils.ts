@@ -32,3 +32,4 @@ export const handleGetUser = async () => {
     console.error("Error while getting user: ", error);
   };
 };
+

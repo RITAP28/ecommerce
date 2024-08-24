@@ -5,8 +5,9 @@ import { FaShoppingCart } from "react-icons/fa";
 import { AiFillThunderbolt } from "react-icons/ai";
 import Image from "next/image";
 import axios from "axios";
-import { UserProps } from "../utils/fetchUser";
+import { handleFetchUser, handleGetUser, UserProps } from "../utils/fetchUser";
 import { useRouter } from "next/navigation";
+import { Toast, useToast } from "@chakra-ui/react";
 
 interface ProductProps {
   productId: number;
@@ -19,6 +20,7 @@ interface ProductProps {
 
 const ProductCard = () => {
   const router = useRouter();
+  const toast = useToast();
   const [products, setProducts] = useState<ProductProps[]>([]);
   const [productsLoading, setProductsLoading] = useState<boolean>(true);
   const [imageLoading, setImageLoading] = useState<boolean>(false);
@@ -27,20 +29,24 @@ const ProductCard = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleGetUser = async () => {
-    setLoading(true);
     try {
       const user = await axios.get("/api/auth/validate");
       if (!user) {
         router.push("/signin");
+        toast({
+          title: "Sorry, you have to login first",
+          status: 'info',
+          isClosable: true,
+          duration: 4000
+        });
         return;
       }
       console.log(user.data.user);
       setUser(user.data.user);
     } catch (error) {
-      console.error("Error while fetching user in cart: ", error);
+      console.error("Error while fetching user: ", error);
       router.push("/signin");
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -67,12 +73,38 @@ const ProductCard = () => {
         productName,
         productDescription,
         productImageLink,
-        userId: user?.id,
-        userName: user?.username
+        userId: user?.id as number,
+        userName: user?.username as string
       });
       console.log(res.data);
+
+      if(res.status === 409){
+        toast({
+          title: `Product already in cart`,
+          description: `Product ${productName} is already in your cart`,
+          status: "warning",
+          duration: 4000,
+          isClosable: true
+        });
+        return;
+      };
+
+      toast({
+        title: `Product added successfully`,
+        description: `Product ${productName} has been added to your cart`,
+        status: "success",
+        duration: 4000,
+        isClosable: true
+      });
     } catch (error) {
       console.error("Error while adding to cart: ", error);
+      toast({
+        title: `Addition of product was unsuccessfull.`,
+        description: `Product ${productName} was not added to your cart.`,
+        status: "error",
+        duration: 4000,
+        isClosable: true
+      });
     };
   };
 
@@ -113,6 +145,7 @@ const ProductCard = () => {
                         alt={product.productName}
                         width={80}
                         height={80}
+                        priority={true}
                       />
                   </div>
                   <div
